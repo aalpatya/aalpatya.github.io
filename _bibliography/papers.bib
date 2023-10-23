@@ -11,5 +11,33 @@
   number={2},
   pages={552-559},
   doi={10.1109/LRA.2022.3227858},
-  preview={gbpplanner.gif}
+  website={https://aalpatya.github.io/gbpplanner},
+  abstract={Precise coordinated planning over a forward time window enables safe and highly efficient motion when many robots must work together in tight spaces, but this would normally require centralised control of all devices which is difficult to scale. We demonstrate GBP Planning, a new purely distributed technique based on Gaussian Belief Propagation for multi-robot planning problems, formulated by a generic factor graph defining dynamics and collision constraints over a forward time window. In simulations, we show that our method allows high performance collaborative planning where robots are able to cross each other in busy, intricate scenarios. They maintain shorter, quicker and smoother trajectories than alternative distributed planning techniques even in cases of communication failure. We encourage the reader to view the accompanying video demonstration.},
+  preview={gbpplanner.gif},
+  code={https://github.com/aalpatya/gbpplanner},
+  bib_show={true}
+}
+
+@misc{patwardhan2023distributed,
+      title={A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus}, 
+      author={Patwardhan, Aalok and Davison, Andrew J.},
+      year={2023},
+      eprint={2310.01930},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      abstract={The distributed coordination of robot teams performing complex tasks is challenging to formulate. The different aspects of a complete task such as local planning for obstacle avoidance, global goal coordination and collaborative mapping are often solved separately, when clearly each of these should influence the others for the most efficient behaviour. In this paper we use the example application of distributed information acquisition as a robot team explores a large space to show that we can formulate the whole problem as a single factor graph with multiple connected layers representing each aspect. We use Gaussian Belief Propagation (GBP) as the inference mechanism, which permits parallel, on-demand or asynchronous computation for efficiency when different aspects are more or less important. This is the first time that a distributed GBP multi-robot solver has been proven to enable intelligent collaborative behaviour rather than just guiding robots to individual, selfish goals. },
+      website={https://aalpatya.github.io/gbpstack},
+      preview={gbpstack.gif},
+      bib_show={true}
+}
+
+
+@inproceedings{
+patwardhan2023distributedswarm,
+title={Distributed Formation Planning for Robot Swarms},
+author={Aalok Patwardhan},
+booktitle={Workshop on Distributed Graph Algorithms for Robotics at ICRA},
+year={2023},
+abstract={A swarm of robots is often required to create formations in space whilst avoiding obstacles in the environment. In order to do so a high degree of coordination is required between the robots to ensure smooth and safe paths. We formulate formation planning as performing inference on a factor graph using Gaussian Belief Propagation (GBP). This work is an outline of the real time and interactive demos we would like to show at the Distributed Graphs Workshop at ICRA 2023. We show some examples of the demos that will be displayed, and hope that this work encourages more research in this field.},
+preview={swarmformations.gif}
 }

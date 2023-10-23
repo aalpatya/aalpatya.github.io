@@ -2,11 +2,22 @@
 layout: page
 permalink: /teaching/
 title: teaching
-description: Materials for courses you taught. Replace this text with your description.
-nav: false
+description: 
+nav: true
 nav_order: 5
 ---
+## Tutoring
 
-For now, this page is assumed to be a static description of your courses. You can convert it to a collection similar to `_projects/` so that you can have a dedicated page for each course.
+I am a private tutor for GCSE and A-Levels specialising in Maths, Further Maths and Physics.
 
-Organize your courses by years, topics, or universities, however you like!
+I offer university entrance guidance (personal statements and interview practice for Imperial and Oxbridge).
+
+My aim is to instill confidence and a love for learning within my students, and my preferred method of teaching is online.
+Please feel free to email me at [a.patwardhan21@imperial.ac.uk](a.patwardhan21@imperial.ac.uk) if you would like to enquire further.
+
+---
+## Director of Studies, Engineering and AI
+
+I was recently appointed as the Director of Studies for Engineering and AI at [Cambridge Programmes](https://new.cambridgeprogrammes.com/), an academic summer school that takes place in Cambridge each year.
+
+---
