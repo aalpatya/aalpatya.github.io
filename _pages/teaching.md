@@ -1,16 +1,23 @@
 ---
 layout: page
 permalink: /teaching/
-title: teaching
+title: Teaching
 description: 
 nav: true
 nav_order: 5
 ---
 ## Tutoring
 
-I am a private tutor for GCSE and A-Levels specialising in Maths, Further Maths and Physics.
+I am a private tutor for Key Stage 2, GCSE, A-Levels and University admissions.
+My subjects include (but are not limited to):
+- Mathematics
+- Further Mathematics
+- Physics
 
-I offer university entrance guidance (personal statements and interview practice for Imperial and Oxbridge).
+I also offer university entrance guidance:
+- ENGAA and PAT preparation
+- Personal statements (Imperial and Oxbridge)
+- Interview practice (Imperial and Oxbridge)
 
 My aim is to instill confidence and a love for learning within my students, and my preferred method of teaching is online.
 Please feel free to email me at [a.patwardhan21@imperial.ac.uk](a.patwardhan21@imperial.ac.uk) if you would like to enquire further.

@@ -61,7 +61,7 @@
                 </a>
               </li>
               {%- endif %}
-
+              
               <!-- Other pages -->
               {%- assign sorted_pages = site.pages | sort: "nav_order" -%}
               {%- for p in sorted_pages -%}
@@ -94,8 +94,10 @@
               {%- endif -%}
               {%- endif -%}
               {% endfor -%}
+              <!-- CV link -->
+              <li class="nav-item"><a class="nav-link" href="{{ '/assets/pdf/Aalok_Patwardhan_Research_CV.pdf' | relative_url }}">CV</a></li> 
               {%- if site.enable_darkmode %}
-
+              
               <!-- Toogle theme mode -->
               <li class="toggle-container">
                 <button id="light-toggle" title="Change theme">
