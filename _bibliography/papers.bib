@@ -18,6 +18,19 @@
   bib_show={true}
 }
 
+@misc{UAREME,
+      title={U-ARE-ME: Uncertainty-Aware Rotation Estimation in Manhattan Environments}, 
+      author={Patwardhan, Aalok and Rhodes, Callum and Bae, Gwangbin and Davison, Andrew J.},
+      year={2024},
+      eprint={2403.15583},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      abstract={Camera rotation estimation from a single image is a challenging task, often requiring depth data and/or camera intrinsics, which are generally not available for in-the-wild videos. Although external sensors such as inertial measurement units (IMUs) can help, they often suffer from drift and are not applicable in non-inertial reference frames. We present U-ARE-ME, an algorithm that estimates camera rotation along with uncertainty from uncalibrated RGB images. Using a Manhattan World assumption, our method leverages the per-pixel geometric priors encoded in single-image surface normal predictions and performs optimisation over the SO(3) manifold. Given a sequence of images, we can use the per-frame rotation estimates and their uncertainty to perform multi-frame optimisation, achieving robustness and temporal consistency. Our experiments demonstrate that U-ARE-ME performs comparably to RGB-D methods and is more robust than sparse feature-based SLAM methods. We encourage the reader to view the accompanying video at this https URL for a visual overview of our method.},
+      website={https://callum-rhodes.github.io/U-ARE-ME/},
+      preview={uareme.gif},
+      bib_show={true}
+}
+
 @misc{patwardhan2023distributed,
       title={A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus (ICRA 2024)}, 
       author={Patwardhan, Aalok and Davison, Andrew J.},
