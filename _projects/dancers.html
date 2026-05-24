@@ -1,10 +1,10 @@
 ---
 layout: none
-permalink: /gbpstack/
-title: Distributed Multi-Robot Exploration, Information Acquisition and Consensus
-description: Can robots help each other explore and collect noisy information about a global state?
-importance: 3
-img: assets/img/publication_preview/gbpstack.gif
+permalink: /dancers/
+title: DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms
+description: Robots can communicate *locally* but the swarm can agree *globally*.
+importance: 1
+img: assets/img/publication_preview/dancers_A.gif
 category: work
 ---
 <!DOCTYPE html>
@@ -23,26 +23,26 @@ category: work
     <!-- Meta tags for social media banners, these should be filled in appropriatly as they are your "business card" -->
     <!-- Replace the content tag with appropriate information -->
     <meta name="description" content="DESCRIPTION META TAG">
-    <meta property="og:title" content="Distributing Multi-Robot Collaboration with Gaussian Belief Propagation"/>
-    <meta property="og:description" content="Distributing Multi-Robot Collaboration with Gaussian Belief Propagation"/>
+    <meta property="og:title" content="DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms"/>
+    <meta property="og:description" content="DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms"/>
     <meta property="og:url" content="https://aalpatya.github.io/"/>
     <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X630-->
-    <meta property="og:image" content="{{ site.baseurl }}/static/image/gbp30_paths.png" />
+    <meta property="og:image" content="{{ site.baseurl }}/static/image/TODO.png" />
     <meta property="og:image:width" content="1200"/>
     <meta property="og:image:height" content="630"/>
     
     
-    <meta name="twitter:title" content="Distributing Multi-Robot Collaboration with Gaussian Belief Propagation">
-    <meta name="twitter:description" content="Distributing Multi-Robot Collaboration with Gaussian Belief Propagation">
+    <meta name="twitter:title" content="DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms">
+    <meta name="twitter:description" content="DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms">
     <!-- Path to banner image, should be in the path listed below. Optimal dimenssions are 1200X600-->
-    <meta name="twitter:image" content="{{ site.baseurl }}/static/images/gbp30_paths.png">
-    <meta name="twitter:card" content="RobotPaths">
+    <meta name="twitter:image" content="{{ site.baseurl }}/static/images/dancers.png">
+    <meta name="twitter:card" content="summary_large_image">
     <!-- Keywords for your paper to be indexed by-->
     <meta name="keywords" content="distributed multirobot motion planning">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-  <title>A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus</title>
+  <title>DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms</title>
   <!-- <link rel="icon" type="image/png" href="{{ site.baseurl }}/static/images/aalok.png" /> -->
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
   rel="stylesheet">
@@ -70,9 +70,9 @@ category: work
       <div class="container is-max-desktop">
         <div class="columns is-centered">
           <div class="column has-text-centered">
-            <h1 class="title is-1 publication-title">A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus</h1>
+            <h1 class="title is-1 publication-title">DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms</h1>
             <div class="is-size-5 publication-authors">
-                <span class="author-block"><b><em>IEEE ICRA (2024)</em></span>
+                <span class="author-block"><b><em>IEEE ICRA (2026)</em></span>
                 <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
               </div>            
             <div class="is-size-5 publication-authors">
@@ -88,6 +88,24 @@ category: work
                     <span class="author-block">Imperial College London and Dyson Robotics Lab</span>
                     <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
                   </div>
+                  <!-- Image carousel -->
+                  <section class="hero is-small">
+                    <div class="hero-body">
+                      <div class="container">
+                          <!-- Image -->
+                          <div class="columns is-centered has-text-centered">
+                          <div class="column is-three-fifths">
+                            <div class="item">
+                              <!-- Your image here -->
+                              <img src="{{ site.baseurl }}/static/images/dancers_A.gif" alt="DANCeRS A"/>
+                              <img src="{{ site.baseurl }}/static/images/dancers_GBP.gif" alt="DANCeRS GBP"/>
+                            </div>
+                          </div>
+                          </div>
+                      </div>
+                    </div>
+                  </section>
+                  <!-- End image carousel -->  
 
                   <div class="column has-text-centered">
                     <div class="publication-links">
@@ -118,7 +136,7 @@ category: work
                     <div class="publication-links">
                       <!-- Arxiv PDF link -->
                       <span class="link-block">
-                        <a href="https://ieeexplore.ieee.org/document/10610185" target="_blank"
+                        <a href="https://arxiv.org/abs/2508.18153" target="_blank"
                         class="external-link button is-large is-rounded is-dark">
                         <span class="icon">
                           <i class="fas fa-file-pdf"></i>
@@ -126,6 +144,29 @@ category: work
                         <span>Paper</span>
                       </a>
                     </span>
+                    <!-- Code Link -->
+                    <span class="link-block">
+                      <span
+                        class="external-link button is-large is-rounded is-dark"
+                        aria-disabled="true"
+                        style="opacity: 0.5; pointer-events: none;"
+                      >
+                        <span class="icon">
+                          <i class="fab fa-github"></i>
+                        </span>
+                        <span>Code</span>
+                      </span>
+                    </span>
+                  
+                      <span class="link-block">
+                      <a href="https://www.youtube.com/watch?v=CrX1b7Otlc4" target="_blank"
+                      class="external-link button is-large is-rounded is-dark">
+                      <span class="icon">
+                          <i class="fab fa-youtube"></i>
+                      </span>
+                      <span>Code Tutorial Video</span>
+                      </a>
+                      </span>
 
                 </div>
               </div>
@@ -145,7 +186,7 @@ category: work
       <div class="columns is-centered has-text-centered">
           <div class="column is-half">
               <div class="publication-video">
-                  <iframe src="https://www.youtube.com/embed/47SzujUq9dg?&autoplay=1&mute=1&loop=1&playlist=47SzujUq9dg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                  <iframe src="https://www.youtube.com/embed/CrX1b7Otlc4?&autoplay=1&mute=1&loop=1&playlist=47SzujUq9dg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                 </div>
         </div>
       </div>
@@ -163,40 +204,3 @@ category: work
   </body>
   </html>
 
-<!-- Default Statcounter code for GBPStack https://aalpatya.github.io/gbpstack
--->
-<script type="text/javascript">
-var sc_project=12892523; 
-var sc_invisible=1; 
-var sc_security="1a01eea7"; 
-</script>
-<script type="text/javascript"
-src="https://www.statcounter.com/counter/counter.js" async></script>
-<noscript><div class="statcounter"><a title="Web Analytics"
-href="https://statcounter.com/" target="_blank"><img class="statcounter"
-src="https://c.statcounter.com/12892523/0/1a01eea7/1/" alt="Web Analytics"
-referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
-<!-- End of Statcounter Code -->
-</body></html>
-<script>
-    var videos = document.getElementsByClassName("source");
-    for (var i = 0; i < videos.length; i++) {
-        var source = videos[i].getElementsByTagName("a");
-        if (source[0].href.includes("youtube")) {
-            var videoObject = document.createElement('iframe');
-            videoObject.src = source[0].href.replace("watch?v=", "embed/");
-            videos[i].style.padding = "0";
-            videoObject.style.width = "100%";
-            videos[i].append(videoObject);
-            source[0].remove();
-        } else {
-            var videoObject = document.createElement('video');
-            videos[i].style.padding = "0";
-            videoObject.src = source[0].href;
-            videoObject.controls = true;
-            videoObject.style.width = "100%";
-            videos[i].append(videoObject);
-            source[0].remove();
-        }
-    }
-</script>

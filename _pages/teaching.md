@@ -5,6 +5,12 @@ title: Teaching
 description: 
 nav: true
 nav_order: 5
+
+---
+## Director of Studies, Engineering and AI
+
+I am the Director of Studies for the Engineering and AI course at [Cambridge Programmes](https://new.cambridgeprogrammes.com/), an academic summer school that takes place in Cambridge each year.
+
 ---
 ## Tutoring
 
@@ -21,10 +27,5 @@ I also offer university entrance guidance:
 
 My aim is to instill confidence and a love for learning within my students, and my preferred method of teaching is online.
 Please feel free to email me at [a.patwardhan21@imperial.ac.uk](a.patwardhan21@imperial.ac.uk) if you would like to enquire further.
-
----
-## Director of Studies, Engineering and AI
-
-I was recently appointed as the Director of Studies for Engineering and AI at [Cambridge Programmes](https://new.cambridgeprogrammes.com/), an academic summer school that takes place in Cambridge each year.
 
 ---
