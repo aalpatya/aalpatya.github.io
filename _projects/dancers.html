@@ -2,7 +2,7 @@
 layout: none
 permalink: /dancers/
 title: DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms
-description: Robots can communicate *locally* but the swarm can agree *globally*.
+description: Robots can communicate locally but the swarm can agree globally.
 importance: 1
 img: assets/img/publication_preview/dancers_A.gif
 category: work
@@ -63,7 +63,6 @@ category: work
 </head>
 <body>
 
-
   <section class="hero">
     <div class="hero-body">
       <div class="container is-max-desktop">
@@ -71,9 +70,27 @@ category: work
           <div class="column has-text-centered">
             <h1 class="title is-1 publication-title">DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms</h1>
             <div class="is-size-5 publication-authors">
-                <span class="author-block"><b><em>IEEE ICRA (2026)</em></span>
-                <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
-              </div>            
+              <span class="author-block"><b><em>IEEE ICRA (2026)</em></span>
+              <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+            </div>
+    
+            <!-- Image carousel -->
+            <section class="hero is-small">
+              <div class="hero-body">
+                <div class="container">
+                    <!-- Image -->
+                    <div class="columns is-centered has-text-centered">
+                    <div class="column is-three-fifths">
+                      <div class="item">
+                        <!-- Your image here -->
+                              <img src="{{ site.baseurl }}/static/images/dancers_A.gif" alt="DANCeRS A"/>
+                      </div>
+                    </div>
+                    </div>
+                </div>
+              </div>
+            </section>
+            <!-- End image carousel -->            
             <div class="is-size-5 publication-authors">
               <!-- Paper authors -->
               <span class="author-block">
@@ -81,31 +98,12 @@ category: work
                   <span class="author-block">
                     Andrew J. Davison
                   </span>
-                  </div>
-
-                  <div class="is-size-5 publication-authors">
-                    <span class="author-block">Imperial College London and Dyson Robotics Lab</span>
-                    <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
-                  </div>
-                  <!-- Image carousel -->
-                  <section class="hero is-small">
-                    <div class="hero-body">
-                      <div class="container">
-                          <!-- Image -->
-                          <div class="columns is-centered has-text-centered">
-                          <div class="column is-three-fifths">
-                            <div class="item">
-                              <!-- Your image here -->
-                              <img src="{{ site.baseurl }}/static/images/dancers_A.gif" alt="DANCeRS A"/>
-                              <img src="{{ site.baseurl }}/static/images/dancers_GBP.gif" alt="DANCeRS GBP"/>
-                            </div>
-                          </div>
-                          </div>
-                      </div>
-                    </div>
-                  </section>
-                  <!-- End image carousel -->  
-
+                </div>
+                <div class="is-size-5 publication-authors">
+                  <span class="author-block">Imperial College London and Dyson Robotics Lab</span>
+                  <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+                </div>
+                  
                   <div class="column has-text-centered">
                     <div class="publication-links">
                       <span class="link-block">
@@ -131,6 +129,9 @@ category: work
                     </div>
                   </div>
 
+
+
+
                   <div class="column has-text-centered">
                     <div class="publication-links">
                       <!-- Arxiv PDF link -->
@@ -143,19 +144,17 @@ category: work
                         <span>Paper</span>
                       </a>
                     </span>
+                    
                     <!-- Code Link -->
                     <span class="link-block">
-                      <span
-                        class="external-link button is-large is-rounded is-dark"
-                        aria-disabled="true"
-                        style="opacity: 0.5; pointer-events: none;"
-                      >
-                        <span class="icon">
-                          <i class="fab fa-github"></i>
-                        </span>
-                        <span>Code</span>
+                      <a href="https://github.com/aalpatya/gbpplanner" target="_blank"
+                      class="external-link button is-large is-rounded is-dark">
+                      <span class="icon">
+                        <i class="fab fa-github"></i>
                       </span>
-                    </span>
+                      <span>Code</span>
+                    </a>
+                  </span>
                   
                       <span class="link-block">
                       <a href="https://www.youtube.com/watch?v=CrX1b7Otlc4" target="_blank"
@@ -163,18 +162,20 @@ category: work
                       <span class="icon">
                           <i class="fab fa-youtube"></i>
                       </span>
-                      <span>Code Tutorial Video</span>
+                      <span>Demo Video</span>
                       </a>
                       </span>
 
                 </div>
               </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-  <!-- Youtube video -->
+    </section>
+
+
+<!-- Youtube video -->
 <section class="hero is-small is-light">
   <div class="hero-body">
     <div class="container">
@@ -185,7 +186,8 @@ category: work
       <div class="columns is-centered has-text-centered">
           <div class="column is-half">
               <div class="publication-video">
-                  <iframe src="https://www.youtube.com/embed/CrX1b7Otlc4?&autoplay=1&mute=1&loop=1&playlist=47SzujUq9dg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                  <!-- Youtube embed code here -->
+                  <iframe src="https://www.youtube.com/embed/CrX1b7Otlc4?&autoplay=1&mute=1&loop=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                 </div>
         </div>
       </div>
@@ -194,12 +196,45 @@ category: work
 </section>
 <!-- End youtube video -->
 
+<!--BibTex citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">Cite Us</h2>
+      <pre><code>@inproceedings{
+                title={DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms},
+                author={Patwardhan, Aalok and Davison, Andrew J.},
+                booktitle={ICRA},
+                year={2026},
+                website={https://aalpatya.github.io/dancers},
+      }
+      </code></pre>
+    </div>
+</section>
+<!--End BibTex citation -->
+
+
+  <!-- <footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+
+          <p>
+            <em>This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a></em>.
+          </p>
+          <a href="https://jstrieb.github.io/link-lock/#eyJ2IjoiMC4wLjEiLCJlIjoidkgvOC9ERXRWT3Q1L214TkxTOEQ2VEIwcXJhQzNUU0hZWW9JWDAyaWNnL082b2hrZ1ErNGMvV29VdHhUeE5RbjZhcExqTmEyeHVrWE9KK3Y4VFR0aTRGYTltWm9XY0lhSmhabGRBK1RBeTVNIiwicyI6IjFSZmxZbS91TGVZQS9IWTQwT2poU2c9PSIsImkiOiJmb2hraFdYcWFqVlc1UmlYIn0=">ppt</a>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</footer> -->
+
 <!-- Statcounter tracking code -->
   
 <!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
 
-    <!-- End of Statcounter Code -->
+    <!-- End of Statcounter Code -->  
 
   </body>
   </html>
-
