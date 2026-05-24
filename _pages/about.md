@@ -17,12 +17,13 @@ social: true  # includes social icons at the bottom of the page
 ---
 
 Welcome to my website.
-I currently am a 3rd year PhD Candidate in the [Dyson Robotics Lab](https://www.imperial.ac.uk/dyson-robotics-lab/) at Imperial College London.
-My [research]({{ site.baseurl }}/research) is mainly in distributed multi-robot systems, as well as computer vision for robotics.
+I am a lead research scientist (Computer Vision) at [Cartwheel](https://www.getcartwheel.com), where I am working on marker-less motion capture for animation; my interest is in human pose estimation from RGB video.
+
+I recently completed my PhD in the [Dyson Robotics Lab](https://www.imperial.ac.uk/dyson-robotics-lab/) at Imperial College London, where my [research]({{ site.baseurl }}/research) was mainly in distributed multi-robot systems, as well as computer vision for robotics.
 
 Previously I was a signal processing engineer at Cambridge Consultants, working on wireless technologies and embedded systems.
 
-Outside of work I am a private tutor for Maths and Physics for GCSE and A-Levels, and also specialise in Oxbridge admissions tutoring and interview practice.
+Outside of work I am a private tutor for Maths and Physics for GCSE and A-Levels, and also specialise in Oxbridge admissions tutoring and interview practice. I am a Director of Studies of the Engineering and AI course at [Cambridge Programmes](https://cambridgeprogrammes.com/), an academic summer school.
 
 Feel free to reach out via any of the methods below!
 
