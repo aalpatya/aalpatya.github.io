@@ -9,7 +9,7 @@ nav_order: 5
 ---
 ## Director of Studies, Engineering and AI
 
-I am the Director of Studies for the Engineering and AI course at [Cambridge Programmes](https://new.cambridgeprogrammes.com/), an academic summer school that takes place in Cambridge each year.
+I am the Director of Studies for the Engineering and AI course at [Cambridge Programmes](https://cambridgeprogrammes.com), an academic summer school that takes place in Cambridge each year.
 
 ---
 ## Tutoring
