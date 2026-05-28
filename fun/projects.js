@@ -1,1 +1,1 @@
-window.funProjects=[{title:"Assassin",slug:"assassin",url:"../assassin/index.html",mark:"\ud83e\udd77",description:"Secret targets, odd objects, suspicious places."}];
+window.funProjects=[{title:"Assassin",slug:"assassin",url:"../assassin/index.html",mark:"\ud83e\udd77",description:"Secret targets, odd objects, suspicious places."},{title:"Chameleon",slug:"chameleon",url:"../chameleon/index.html",mark:"\ud83e\udd8e",description:"One secret word, one hidden bluff."}];

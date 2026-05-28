@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chameleon</title>
+    <meta name="robots" content="noindex">
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f8f5ec;
+        --muted: #b9c2b9;
+        --glass: rgba(14, 20, 18, 0.8);
+        --edge: rgba(248, 245, 236, 0.18);
+        --green: #62c98f;
+        --gold: #e2bd76;
+        --accent: #8bd7bf;
+        --danger: #ed7678;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 16% 12%, rgba(98, 201, 143, 0.2), transparent 25rem),
+          radial-gradient(circle at 88% 6%, rgba(226, 189, 118, 0.16), transparent 26rem),
+          linear-gradient(135deg, #101514 0%, #151916 54%, #0d1212 100%);
+      }
+
+      main {
+        width: min(900px, calc(100% - 32px));
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 32px 0;
+        display: grid;
+        place-items: center;
+      }
+
+      .stage {
+        width: 100%;
+        min-height: min(660px, calc(100vh - 64px));
+        padding: clamp(24px, 6vw, 64px);
+        display: grid;
+        align-content: start;
+        gap: clamp(34px, 7vh, 64px);
+        background: var(--glass);
+        border: 1px solid var(--edge);
+        border-radius: 8px;
+        box-shadow: 0 28px 90px rgba(0, 0, 0, 0.38);
+        backdrop-filter: blur(18px);
+      }
+
+      .status {
+        min-height: 22px;
+        color: var(--muted);
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .screen {
+        display: none;
+        gap: 28px;
+        justify-items: center;
+        text-align: center;
+      }
+
+      .screen.active {
+        display: grid;
+      }
+
+      .kicker {
+        margin: 0 0 12px;
+        color: var(--accent);
+        font-size: clamp(0.95rem, 2vw, 1.18rem);
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        max-width: 780px;
+        font-size: clamp(2.35rem, 7.8vw, 5.2rem);
+        line-height: 0.92;
+      }
+
+      h2 {
+        font-size: clamp(2rem, 5.8vw, 4.4rem);
+        line-height: 0.95;
+      }
+
+      p {
+        max-width: 650px;
+        margin: 0;
+        color: var(--muted);
+        font-size: clamp(1rem, 2vw, 1.18rem);
+        line-height: 1.7;
+      }
+
+      form {
+        width: min(100%, 560px);
+        display: grid;
+        gap: 16px;
+        justify-self: center;
+        text-align: center;
+      }
+
+      label {
+        display: grid;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      input {
+        width: 100%;
+        min-height: 54px;
+        padding: 12px 14px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--edge);
+        border-radius: 8px;
+        font: inherit;
+        text-align: center;
+      }
+
+      input:focus {
+        border-color: rgba(98, 201, 143, 0.84);
+        outline: none;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      button {
+        min-height: 50px;
+        padding: 0 18px;
+        color: #081710;
+        background: var(--gold);
+        border: 1px solid transparent;
+        border-radius: 8px;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+      }
+
+      button:hover,
+      button:focus-visible {
+        transform: translateY(-2px);
+        background: #f0cc84;
+        outline: none;
+      }
+
+      button.success {
+        background: var(--green);
+      }
+
+      button.success:hover,
+      button.success:focus-visible {
+        background: #75dda3;
+      }
+
+      button.secondary {
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: var(--edge);
+      }
+
+      button.secondary:hover,
+      button.secondary:focus-visible {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .notice {
+        min-height: 24px;
+        color: var(--danger);
+        font-size: 0.95rem;
+      }
+
+      .role-card {
+        width: min(100%, 560px);
+        min-height: 180px;
+        padding: clamp(20px, 5vw, 36px);
+        display: grid;
+        align-content: center;
+        gap: 14px;
+        background: rgba(255, 255, 255, 0.055);
+        border: 1px solid var(--edge);
+        border-radius: 8px;
+      }
+
+      .secret {
+        color: var(--ink);
+        font-size: clamp(2.2rem, 8vw, 5.4rem);
+        font-weight: 900;
+        line-height: 0.95;
+        overflow-wrap: anywhere;
+      }
+
+      .chameleon {
+        color: var(--danger);
+      }
+
+      @media (max-width: 720px) {
+        main {
+          min-height: auto;
+        }
+
+        .stage {
+          min-height: calc(100vh - 64px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="stage" aria-live="polite">
+        <div class="status" id="status"></div>
+
+        <section class="screen active" id="setup-screen">
+          <div>
+            <p class="kicker">Chameleon</p>
+            <h1>New Game</h1>
+          </div>
+          <p>Choose a secret word and the number of players. One hidden chameleon will have to blend in.</p>
+          <form id="setup-form" autocomplete="off">
+            <label>
+              Secret word
+              <input id="secret-word" name="secret-word" required>
+            </label>
+            <label>
+              Number of players
+              <input id="player-count" name="player-count" type="number" min="3" max="30" inputmode="numeric" required>
+            </label>
+            <p class="notice" id="setup-notice"></p>
+            <div class="actions">
+              <button class="success" type="submit">Start Reveals</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="screen" id="handoff-screen">
+          <div>
+            <p class="kicker">Pass the device to</p>
+            <h2 id="player-label"></h2>
+          </div>
+          <p>Only this player should press reveal.</p>
+          <div class="actions">
+            <button type="button" id="reveal-button">Reveal</button>
+          </div>
+        </section>
+
+        <section class="screen" id="role-screen">
+          <div>
+            <p class="kicker" id="role-player"></p>
+            <h2>Your Word</h2>
+          </div>
+          <div class="role-card">
+            <span class="secret" id="role-word"></span>
+            <p id="role-note"></p>
+          </div>
+          <div class="actions">
+            <button type="button" id="complete-button">Complete</button>
+          </div>
+        </section>
+
+        <section class="screen" id="finished-screen">
+          <div>
+            <p class="kicker">All roles seen</p>
+            <h1>Start the clues</h1>
+          </div>
+          <p>Everyone has seen their role. Take turns saying one clue word, then decide who the chameleon is.</p>
+          <div class="actions">
+            <button class="success" type="button" id="new-game-button">New Game</button>
+            <button type="button" id="reveal-word-button">Reveal Word</button>
+          </div>
+        </section>
+
+        <section class="screen" id="word-screen">
+          <div>
+            <p class="kicker">Secret word</p>
+            <h1 id="final-word"></h1>
+          </div>
+          <div class="actions">
+            <button class="success" type="button" id="word-new-game-button">New Game</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const state = {
+        secretWord: "",
+        playerCount: 0,
+        chameleonIndex: 0,
+        revealIndex: 0,
+        roleVisible: false
+      };
+
+      const screens = {
+        setup: document.querySelector("#setup-screen"),
+        handoff: document.querySelector("#handoff-screen"),
+        role: document.querySelector("#role-screen"),
+        finished: document.querySelector("#finished-screen"),
+        word: document.querySelector("#word-screen")
+      };
+
+      const status = document.querySelector("#status");
+      const setupForm = document.querySelector("#setup-form");
+      const secretWordInput = document.querySelector("#secret-word");
+      const playerCountInput = document.querySelector("#player-count");
+      const setupNotice = document.querySelector("#setup-notice");
+      const playerLabel = document.querySelector("#player-label");
+      const rolePlayer = document.querySelector("#role-player");
+      const roleWord = document.querySelector("#role-word");
+      const roleNote = document.querySelector("#role-note");
+      const finalWord = document.querySelector("#final-word");
+
+      function showScreen(screenName) {
+        Object.values(screens).forEach((screen) => screen.classList.remove("active"));
+        screens[screenName].classList.add("active");
+        updateStatus();
+      }
+
+      function updateStatus() {
+        if (screens.handoff.classList.contains("active") || screens.role.classList.contains("active")) {
+          status.textContent = `${state.revealIndex + 1} of ${state.playerCount}`;
+          return;
+        }
+
+        status.textContent = "";
+      }
+
+      function cleanValue(value) {
+        return value.trim().replace(/\s+/g, " ");
+      }
+
+      function startGame(event) {
+        event.preventDefault();
+
+        const secretWord = cleanValue(secretWordInput.value);
+        const playerCount = Number.parseInt(playerCountInput.value, 10);
+
+        if (!secretWord) {
+          setupNotice.textContent = "Please enter a secret word.";
+          secretWordInput.focus();
+          return;
+        }
+
+        if (!Number.isInteger(playerCount) || playerCount < 3) {
+          setupNotice.textContent = "Use at least 3 players.";
+          playerCountInput.focus();
+          return;
+        }
+
+        state.secretWord = secretWord;
+        state.playerCount = playerCount;
+        state.chameleonIndex = Math.floor(Math.random() * playerCount);
+        state.revealIndex = 0;
+        state.roleVisible = false;
+        setupNotice.textContent = "";
+        showHandoff();
+      }
+
+      function showHandoff() {
+        if (state.revealIndex >= state.playerCount) {
+          showScreen("finished");
+          return;
+        }
+
+        playerLabel.textContent = `Player ${state.revealIndex + 1}`;
+        showScreen("handoff");
+      }
+
+      function revealRole() {
+        const isChameleon = state.revealIndex === state.chameleonIndex;
+
+        rolePlayer.textContent = `Player ${state.revealIndex + 1}`;
+        roleWord.classList.toggle("chameleon", isChameleon);
+        roleWord.textContent = isChameleon ? "CHAMELEON" : state.secretWord;
+        roleNote.textContent = isChameleon
+          ? "You do not know the word. Blend in."
+          : "Give one clue word related to this.";
+        state.roleVisible = true;
+        showScreen("role");
+      }
+
+      function completeReveal() {
+        roleWord.textContent = "";
+        roleNote.textContent = "";
+        state.roleVisible = false;
+        state.revealIndex += 1;
+        showHandoff();
+      }
+
+      function resetGame() {
+        state.secretWord = "";
+        state.playerCount = 0;
+        state.chameleonIndex = 0;
+        state.revealIndex = 0;
+        state.roleVisible = false;
+        setupForm.reset();
+        setupNotice.textContent = "";
+        finalWord.textContent = "";
+        showScreen("setup");
+        secretWordInput.focus();
+      }
+
+      function revealWord() {
+        finalWord.textContent = state.secretWord;
+        showScreen("word");
+      }
+
+      setupForm.addEventListener("submit", startGame);
+      document.querySelector("#reveal-button").addEventListener("click", revealRole);
+      document.querySelector("#complete-button").addEventListener("click", completeReveal);
+      document.querySelector("#new-game-button").addEventListener("click", resetGame);
+      document.querySelector("#word-new-game-button").addEventListener("click", resetGame);
+      document.querySelector("#reveal-word-button").addEventListener("click", revealWord);
+    </script>
+  </body>
+</html>
