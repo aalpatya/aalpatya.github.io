@@ -270,6 +270,11 @@
         color: var(--green);
       }
 
+      .briefing-player {
+        font-size: clamp(1.7rem, 5vw, 3.4rem);
+        line-height: 1;
+      }
+
       @media (max-width: 720px) {
         main {
           min-height: auto;
@@ -360,7 +365,7 @@
 
         <section class="screen" id="briefing-screen">
           <div>
-            <p class="kicker" id="briefing-player"></p>
+            <p class="kicker briefing-player" id="briefing-player"></p>
             <h2>Your Briefing</h2>
           </div>
           <div class="briefing" aria-label="Target briefing">
