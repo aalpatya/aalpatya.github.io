@@ -1,0 +1,1 @@
+window.funProjects=[{title:"Assassin",slug:"assassin",url:"../assassin/index.html",mark:"\ud83e\udd77",description:"Secret targets, odd objects, suspicious places."}];

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Assassin</title>
+    <meta name="robots" content="noindex">
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #fbf6ed;
+        --muted: #b7bdb8;
+        --glass: rgba(16, 18, 20, 0.78);
+        --glass-strong: rgba(20, 22, 24, 0.94);
+        --edge: rgba(251, 246, 237, 0.18);
+        --accent: #d95f62;
+        --accent-strong: #f0777a;
+        --gold: #e1bb74;
+        --green: #55b987;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 14% 14%, rgba(217, 95, 98, 0.2), transparent 25rem),
+          radial-gradient(circle at 86% 4%, rgba(85, 185, 135, 0.15), transparent 24rem),
+          linear-gradient(135deg, #111416 0%, #191514 48%, #101315 100%);
+      }
+
+      main {
+        width: min(900px, calc(100% - 32px));
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 32px 0;
+        display: grid;
+        place-items: center;
+      }
+
+      .stage {
+        width: 100%;
+        min-height: min(660px, calc(100vh - 64px));
+        padding: clamp(24px, 6vw, 64px);
+        display: grid;
+        align-content: start;
+        gap: clamp(34px, 7vh, 64px);
+        background: var(--glass);
+        border: 1px solid var(--edge);
+        border-radius: 8px;
+        box-shadow: 0 28px 90px rgba(0, 0, 0, 0.38);
+        backdrop-filter: blur(18px);
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .back {
+        display: inline-flex;
+        align-items: center;
+        color: var(--muted);
+        font-size: 0.95rem;
+        text-decoration: none;
+      }
+
+      .back:hover,
+      .back:focus-visible {
+        color: var(--ink);
+        outline: none;
+      }
+
+      .status {
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .screen {
+        display: none;
+        gap: 28px;
+        justify-items: center;
+        text-align: center;
+      }
+
+      .screen.active {
+        display: grid;
+      }
+
+      .kicker {
+        margin: 0 0 12px;
+        color: var(--accent);
+        font-size: clamp(0.95rem, 2vw, 1.18rem);
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      h1 {
+        max-width: 780px;
+        font-size: clamp(2.2rem, 7.4vw, 4.9rem);
+        line-height: 0.92;
+      }
+
+      h2 {
+        font-size: clamp(2rem, 5.8vw, 4.4rem);
+        line-height: 0.95;
+      }
+
+      p {
+        max-width: 650px;
+        margin: 0;
+        color: var(--muted);
+        font-size: clamp(1rem, 2vw, 1.18rem);
+        line-height: 1.7;
+      }
+
+      form {
+        width: min(100%, 650px);
+        display: grid;
+        gap: 16px;
+        justify-self: center;
+        text-align: center;
+      }
+
+      form .actions {
+        justify-content: center;
+      }
+
+      label {
+        display: grid;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      input {
+        width: 100%;
+        min-height: 52px;
+        padding: 12px 14px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--edge);
+        border-radius: 8px;
+        font: inherit;
+      }
+
+      input:focus {
+        border-color: rgba(225, 187, 116, 0.8);
+        outline: none;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      button {
+        min-height: 48px;
+        padding: 0 18px;
+        color: #171211;
+        background: var(--gold);
+        border: 1px solid transparent;
+        border-radius: 8px;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+      }
+
+      button:hover,
+      button:focus-visible {
+        transform: translateY(-2px);
+        background: #f0cb85;
+        outline: none;
+      }
+
+      button.secondary {
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: var(--edge);
+      }
+
+      button.secondary:hover,
+      button.secondary:focus-visible {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      button.success {
+        color: #061a12;
+        background: var(--green);
+      }
+
+      button.success:hover,
+      button.success:focus-visible {
+        background: #68d39c;
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+        transform: none;
+      }
+
+      .notice {
+        min-height: 24px;
+        color: var(--accent-strong);
+        font-size: 0.95rem;
+      }
+
+      .briefing {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .briefing-card {
+        min-height: 132px;
+        padding: 18px;
+        display: grid;
+        align-content: space-between;
+        background: rgba(255, 255, 255, 0.055);
+        border: 1px solid var(--edge);
+        border-radius: 8px;
+      }
+
+      .briefing-card span {
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .briefing-card strong {
+        color: var(--ink);
+        font-size: clamp(1.4rem, 4vw, 2rem);
+        line-height: 1.05;
+        overflow-wrap: anywhere;
+      }
+
+      .quiet {
+        color: var(--green);
+      }
+
+      @media (max-width: 720px) {
+        main {
+          min-height: auto;
+        }
+
+        .stage {
+          min-height: calc(100vh - 64px);
+        }
+
+        .topbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .briefing {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="stage" aria-live="polite">
+        <div class="topbar">
+          <a class="back" href="../index.html">&larr; Back to Fun</a>
+          <span class="status" id="status"></span>
+        </div>
+
+        <section class="screen active" id="welcome-screen">
+          <div>
+            <p class="kicker">Assassin</p>
+            <h1>New Game</h1>
+          </div>
+          <p>Collect each player's name, object, and location in private. Once everyone is in, the game creates a closed loop of targets with one object and one location per player.</p>
+          <div class="actions">
+            <button type="button" id="new-game-button">New game</button>
+          </div>
+        </section>
+
+        <section class="screen" id="game-screen">
+          <div>
+            <p class="kicker" id="game-kicker">0 players added</p>
+          </div>
+          <p>Add each player privately, then begin once everyone is in.</p>
+          <div class="actions">
+            <button class="secondary" type="button" id="modify-last-button" disabled>Modify Last Entry</button>
+            <button type="button" id="new-player-button">New Player</button>
+            <button class="success" type="button" id="begin-game-button" disabled>Begin Game</button>
+          </div>
+        </section>
+
+        <section class="screen" id="entry-screen">
+          <div>
+            <p class="kicker" id="entry-kicker">Player 1</p>
+            <h2>Private Entry</h2>
+          </div>
+          <p>Pass the laptop to the current player only. Previous entries stay hidden.</p>
+          <form id="player-form" autocomplete="off">
+            <label>
+              Name
+              <input id="player-name" name="player-name" required>
+            </label>
+            <label>
+              Object
+              <input id="player-object" name="player-object" required>
+            </label>
+            <label>
+              Location
+              <input id="player-location" name="player-location" required>
+            </label>
+            <p class="notice" id="entry-notice"></p>
+            <div class="actions">
+              <button type="submit" id="entry-submit-button">Add Player</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="screen" id="handoff-screen">
+          <div>
+            <p class="kicker">Pass the laptop to</p>
+            <h2 id="handoff-name"></h2>
+          </div>
+          <p>Only this player should continue. Their target details are hidden until they press reveal.</p>
+          <div class="actions">
+            <button type="button" id="reveal-button">Reveal Target</button>
+          </div>
+        </section>
+
+        <section class="screen" id="briefing-screen">
+          <div>
+            <p class="kicker" id="briefing-player"></p>
+            <h2>Your Briefing</h2>
+          </div>
+          <div class="briefing" aria-label="Target briefing">
+            <div class="briefing-card">
+              <span>Target</span>
+              <strong id="target-name"></strong>
+            </div>
+            <div class="briefing-card">
+              <span>Object</span>
+              <strong id="target-object"></strong>
+            </div>
+            <div class="briefing-card">
+              <span>Location</span>
+              <strong id="target-location"></strong>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="button" id="complete-button">Complete</button>
+          </div>
+        </section>
+
+        <section class="screen" id="finished-screen">
+          <div>
+            <p class="kicker quiet">Game ready</p>
+            <h1>Thanks for playing!</h1>
+          </div>
+          <p>Everyone has received their target, object, and location.</p>
+          <div class="actions">
+            <button type="button" id="finished-reallocate-button">Re-allocate targets</button>
+            <button class="success" type="button" id="play-again-button">New game</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const state = {
+        entries: [],
+        assignments: [],
+        revealOrder: [],
+        revealIndex: 0,
+        entryMode: "new"
+      };
+
+      const screens = {
+        welcome: document.querySelector("#welcome-screen"),
+        game: document.querySelector("#game-screen"),
+        entry: document.querySelector("#entry-screen"),
+        handoff: document.querySelector("#handoff-screen"),
+        briefing: document.querySelector("#briefing-screen"),
+        finished: document.querySelector("#finished-screen")
+      };
+
+      const status = document.querySelector("#status");
+      const form = document.querySelector("#player-form");
+      const gameKicker = document.querySelector("#game-kicker");
+      const modifyLastButton = document.querySelector("#modify-last-button");
+      const beginGameButton = document.querySelector("#begin-game-button");
+      const nameInput = document.querySelector("#player-name");
+      const objectInput = document.querySelector("#player-object");
+      const locationInput = document.querySelector("#player-location");
+      const entryKicker = document.querySelector("#entry-kicker");
+      const entryNotice = document.querySelector("#entry-notice");
+      const entrySubmitButton = document.querySelector("#entry-submit-button");
+      const handoffName = document.querySelector("#handoff-name");
+      const briefingPlayer = document.querySelector("#briefing-player");
+      const targetName = document.querySelector("#target-name");
+      const targetObject = document.querySelector("#target-object");
+      const targetLocation = document.querySelector("#target-location");
+
+      function showScreen(screenName) {
+        Object.values(screens).forEach((screen) => screen.classList.remove("active"));
+        screens[screenName].classList.add("active");
+        updateStatus();
+      }
+
+      function updateStatus() {
+        const total = state.entries.length;
+
+        if (screens.game.classList.contains("active") || screens.entry.classList.contains("active")) {
+          status.textContent = `${total} player${total === 1 ? "" : "s"} added`;
+          return;
+        }
+
+        if (screens.handoff.classList.contains("active") || screens.briefing.classList.contains("active")) {
+          status.textContent = `${state.revealIndex + 1} of ${state.revealOrder.length}`;
+          return;
+        }
+
+        status.textContent = "";
+      }
+
+      function updateGamePage() {
+        const total = state.entries.length;
+
+        gameKicker.textContent = `${total} player${total === 1 ? "" : "s"} added`;
+        modifyLastButton.disabled = total === 0;
+        beginGameButton.disabled = total < 2;
+      }
+
+      function resetGame() {
+        state.entries = [];
+        state.assignments = [];
+        state.revealOrder = [];
+        state.revealIndex = 0;
+        state.entryMode = "new";
+        form.reset();
+        entryNotice.textContent = "";
+        updateGamePage();
+        showScreen("game");
+      }
+
+      function cleanValue(value) {
+        return value.trim().replace(/\s+/g, " ");
+      }
+
+      function readEntryForm() {
+        return {
+          name: cleanValue(nameInput.value),
+          object: cleanValue(objectInput.value),
+          location: cleanValue(locationInput.value)
+        };
+      }
+
+      function hasDuplicateName(name) {
+        return state.entries.some((existingEntry, index) => {
+          const isEntryBeingModified = state.entryMode === "modify" && index === state.entries.length - 1;
+          return !isEntryBeingModified && existingEntry.name.toLowerCase() === name.toLowerCase();
+        });
+      }
+
+      function openNewPlayerForm() {
+        state.entryMode = "new";
+        form.reset();
+        entryNotice.textContent = "";
+        entryKicker.textContent = `Player ${state.entries.length + 1}`;
+        entrySubmitButton.textContent = "Add Player";
+        showScreen("entry");
+        nameInput.focus();
+      }
+
+      function openModifyLastForm() {
+        const lastEntry = state.entries[state.entries.length - 1];
+
+        if (!lastEntry) {
+          updateGamePage();
+          showScreen("game");
+          return;
+        }
+
+        state.entryMode = "modify";
+        entryNotice.textContent = "";
+        entryKicker.textContent = "Modify Last Entry";
+        entrySubmitButton.textContent = "Save Entry";
+        nameInput.value = lastEntry.name;
+        objectInput.value = lastEntry.object;
+        locationInput.value = lastEntry.location;
+        showScreen("entry");
+        nameInput.focus();
+      }
+
+      function saveEntry(event) {
+        event.preventDefault();
+
+        const entry = readEntryForm();
+
+        if (!entry.name || !entry.object || !entry.location) {
+          entryNotice.textContent = "Please fill in all three fields.";
+          return;
+        }
+
+        if (hasDuplicateName(entry.name)) {
+          entryNotice.textContent = "That name is already in the game. Use a unique player name.";
+          nameInput.focus();
+          return;
+        }
+
+        if (state.entryMode === "modify") {
+          state.entries[state.entries.length - 1] = entry;
+        } else {
+          state.entries.push(entry);
+        }
+
+        form.reset();
+        entryNotice.textContent = "";
+        state.entryMode = "new";
+        updateGamePage();
+        showScreen("game");
+      }
+
+      function shuffle(items) {
+        const shuffled = [...items];
+
+        for (let index = shuffled.length - 1; index > 0; index -= 1) {
+          const swapIndex = Math.floor(Math.random() * (index + 1));
+          [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+        }
+
+        return shuffled;
+      }
+
+      function allocateTargets() {
+        const playerLoop = shuffle(state.entries);
+        const objects = shuffle(state.entries.map((entry) => entry.object));
+        const locations = shuffle(state.entries.map((entry) => entry.location));
+
+        // Targets are assigned from the next player in a shuffled loop, so a player cannot target themselves.
+        state.assignments = playerLoop.map((player, index) => ({
+          player: player.name,
+          target: playerLoop[(index + 1) % playerLoop.length].name,
+          object: objects[index],
+          location: locations[index]
+        }));
+
+        state.revealOrder = shuffle(state.assignments);
+        state.revealIndex = 0;
+      }
+
+      function beginGame() {
+        if (state.entries.length < 2) {
+          updateGamePage();
+          return;
+        }
+
+        allocateTargets();
+        showHandoff();
+      }
+
+      function currentAssignment() {
+        return state.revealOrder[state.revealIndex];
+      }
+
+      function showHandoff() {
+        const assignment = currentAssignment();
+
+        if (!assignment) {
+          showScreen("finished");
+          return;
+        }
+
+        handoffName.textContent = assignment.player;
+        showScreen("handoff");
+      }
+
+      function revealTarget() {
+        const assignment = currentAssignment();
+
+        briefingPlayer.textContent = assignment.player;
+        targetName.textContent = assignment.target;
+        targetObject.textContent = assignment.object;
+        targetLocation.textContent = assignment.location;
+        showScreen("briefing");
+      }
+
+      function completeBriefing() {
+        targetName.textContent = "";
+        targetObject.textContent = "";
+        targetLocation.textContent = "";
+        state.revealIndex += 1;
+        showHandoff();
+      }
+
+      function reallocateTargets() {
+        targetName.textContent = "";
+        targetObject.textContent = "";
+        targetLocation.textContent = "";
+        allocateTargets();
+        showHandoff();
+      }
+
+      document.querySelector("#new-game-button").addEventListener("click", resetGame);
+      document.querySelector("#play-again-button").addEventListener("click", resetGame);
+      document.querySelector("#new-player-button").addEventListener("click", openNewPlayerForm);
+      document.querySelector("#modify-last-button").addEventListener("click", openModifyLastForm);
+      document.querySelector("#begin-game-button").addEventListener("click", beginGame);
+      document.querySelector("#reveal-button").addEventListener("click", revealTarget);
+      document.querySelector("#complete-button").addEventListener("click", completeBriefing);
+      document.querySelector("#finished-reallocate-button").addEventListener("click", reallocateTargets);
+      form.addEventListener("submit", saveEntry);
+    </script>
+  </body>
+</html>
