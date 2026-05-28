@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fun</title>
+    <meta name="robots" content="noindex">
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f7f2e8;
+        --muted: #b8c0ba;
+        --panel: rgba(20, 24, 27, 0.74);
+        --panel-strong: rgba(28, 34, 38, 0.92);
+        --edge: rgba(247, 242, 232, 0.18);
+        --gold: #e1bb74;
+        --green: #55b987;
+        --red: #d95f62;
+        --shadow: rgba(0, 0, 0, 0.34);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 18% 12%, rgba(85, 185, 135, 0.22), transparent 28rem),
+          radial-gradient(circle at 82% 0%, rgba(217, 95, 98, 0.16), transparent 25rem),
+          linear-gradient(135deg, #111619 0%, #171411 46%, #101316 100%);
+      }
+
+      main {
+        width: min(1080px, calc(100% - 32px));
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 64px 0;
+        display: grid;
+        align-content: center;
+        gap: 36px;
+      }
+
+      .masthead {
+        display: grid;
+        gap: 14px;
+      }
+
+      .eyebrow {
+        margin: 0;
+        color: var(--green);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        max-width: 780px;
+        margin: 0;
+        font-size: clamp(2.8rem, 8vw, 6.8rem);
+        line-height: 0.92;
+        letter-spacing: 0;
+      }
+
+      .intro {
+        max-width: 620px;
+        margin: 0;
+        color: var(--muted);
+        font-size: clamp(1rem, 2vw, 1.22rem);
+        line-height: 1.7;
+      }
+
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 320px));
+        gap: 18px;
+      }
+
+      .tile {
+        min-height: 168px;
+        padding: 20px;
+        display: grid;
+        align-content: space-between;
+        color: inherit;
+        text-decoration: none;
+        background:
+          linear-gradient(145deg, rgba(225, 187, 116, 0.13), transparent 48%),
+          var(--panel);
+        border: 1px solid var(--edge);
+        border-radius: 8px;
+        box-shadow: 0 24px 70px var(--shadow);
+        backdrop-filter: blur(18px);
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      }
+
+      .tile:hover,
+      .tile:focus-visible {
+        transform: translateY(-4px);
+        border-color: rgba(225, 187, 116, 0.62);
+        background:
+          linear-gradient(145deg, rgba(225, 187, 116, 0.2), transparent 48%),
+          var(--panel-strong);
+        outline: none;
+      }
+
+      .tile-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .mark {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(225, 187, 116, 0.42);
+        border-radius: 50%;
+        color: var(--gold);
+        font-size: 1.45rem;
+      }
+
+      .tile h2 {
+        margin: 24px 0 8px;
+        font-size: clamp(1.55rem, 3vw, 2.25rem);
+        letter-spacing: 0;
+      }
+
+      .tile p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      @media (max-width: 620px) {
+        main {
+          min-height: auto;
+          padding: 40px 0;
+        }
+
+        .tile {
+          min-height: 158px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="masthead" aria-labelledby="fun-title">
+        <p class="eyebrow">Private playground</p>
+        <h1 id="fun-title">Fun</h1>
+        <p class="intro">A tucked-away shelf for experiments, games, and odd little things worth clicking.</p>
+      </section>
+
+      <section class="tiles" aria-label="Fun projects" id="project-tiles">
+        <noscript>
+          <a class="tile" href="../assassin/index.html">
+            <span class="tile-top" aria-hidden="true">
+              <span class="mark">🥷</span>
+            </span>
+            <span>
+              <h2>Assassin</h2>
+              <p>Secret targets, odd objects, suspicious places.</p>
+            </span>
+          </a>
+        </noscript>
+      </section>
+    </main>
+
+    <script src="./projects.js"></script>
+    <script>
+      const tiles = document.querySelector("#project-tiles");
+      const projects = Array.isArray(window.funProjects) ? window.funProjects : [];
+
+      tiles.replaceChildren(...projects.map((project) => {
+        const tile = document.createElement("a");
+        tile.className = "tile";
+        tile.href = project.url || `../${project.slug}/index.html`;
+
+        const top = document.createElement("span");
+        top.className = "tile-top";
+        top.setAttribute("aria-hidden", "true");
+
+        const mark = document.createElement("span");
+        mark.className = "mark";
+        mark.textContent = project.mark || project.title.charAt(0);
+
+        const body = document.createElement("span");
+        const title = document.createElement("h2");
+        title.textContent = project.title;
+
+        const description = document.createElement("p");
+        description.textContent = project.description;
+
+        top.append(mark);
+        body.append(title, description);
+        tile.append(top, body);
+
+        return tile;
+      }));
+    </script>
+  </body>
+</html>
