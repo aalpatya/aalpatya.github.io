@@ -125,6 +125,16 @@
         font-size: 1.45rem;
       }
 
+      /* A tile can show a preview gif/image instead of the emoji mark (spans the full tile width). */
+      .thumb {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid var(--edge);
+        background: #000;
+      }
+
       .tile h2 {
         margin: 24px 0 8px;
         font-size: clamp(1.55rem, 3vw, 2.25rem);
@@ -186,9 +196,19 @@
         top.className = "tile-top";
         top.setAttribute("aria-hidden", "true");
 
-        const mark = document.createElement("span");
-        mark.className = "mark";
-        mark.textContent = project.mark || project.title.charAt(0);
+        if (project.image) {
+          const thumb = document.createElement("img");
+          thumb.className = "thumb";
+          thumb.src = project.image;
+          thumb.alt = "";
+          thumb.loading = "lazy";
+          top.append(thumb);
+        } else {
+          const mark = document.createElement("span");
+          mark.className = "mark";
+          mark.textContent = project.mark || project.title.charAt(0);
+          top.append(mark);
+        }
 
         const body = document.createElement("span");
         const title = document.createElement("h2");
@@ -197,7 +217,6 @@
         const description = document.createElement("p");
         description.textContent = project.description;
 
-        top.append(mark);
         body.append(title, description);
         tile.append(top, body);
 
