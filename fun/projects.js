@@ -12,5 +12,12 @@ window.funProjects = [
     url: "../chameleon/index.html",
     mark: "🦎",
     description: "One secret word, one hidden bluff."
+  },
+  {
+    title: "DANCeRS Demo",
+    slug: "dancers",
+    url: "./dancers/index.html",
+    image: "./dancers/dancers.gif",
+    description: "Distributed robot swarms negotiating consensus, in your browser."
   }
 ];
