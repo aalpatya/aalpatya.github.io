@@ -11,8 +11,15 @@ module ExternalPosts
       if site.config['external_sources'] != nil
         site.config['external_sources'].each do |src|
           p "Fetching external posts from #{src['name']}:"
-          xml = HTTParty.get(src['rss_url']).body
-          feed = Feedjira.parse(xml)
+          # A flaky/unparseable external feed shouldn't abort the whole site build.
+          # Warn and skip this source instead of crashing the deploy.
+          begin
+            xml = HTTParty.get(src['rss_url']).body
+            feed = Feedjira.parse(xml)
+          rescue => err
+            Jekyll.logger.warn "ExternalPosts:", "skipping #{src['name']} (#{err.class}: #{err.message})"
+            next
+          end
           feed.entries.each do |e|
             p "...fetching #{e.url}"
             slug = e.title.downcase.strip.gsub(' ', '-').gsub(/[^\w-]/, '')
