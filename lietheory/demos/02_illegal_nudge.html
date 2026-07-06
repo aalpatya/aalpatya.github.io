@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2 · The Illegal Nudge</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #fff; color: #2a2a2a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+  #banner { display: flex; align-items: center; gap: 12px; padding: 11px 18px;
+    border-bottom: 1px solid #e5e7eb; background: #fafbfc; font-size: 14.5px; color: #374151; }
+  #banner b { color: #111; }
+  button { border: 1px solid #d1d5db; background: #f4f5f6; color: #4b5563; border-radius: 8px;
+    padding: 8px 14px; font-size: 14px; font-weight: 500; cursor: pointer; }
+  button:hover { background: #e9ebee; }
+  #main { flex: 1; display: flex; min-height: 0; }
+  #left { flex: 0 0 46%; border-right: 1px solid #e5e7eb; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 20px; padding: 20px; }
+  #right { flex: 1; min-width: 0; position: relative; transition: background .15s; }
+  #right canvas { display: block; width: 100%; height: 100%; }
+  .cap { position: absolute; top: 10px; left: 12px; font-size: 11px; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: .7px; pointer-events: none; }
+
+  .eq { display: flex; align-items: center; gap: 10px; }
+  .Rlabel { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-size: 25px; color: #111; }
+  .Rlabel sub { font-size: 15px; }
+  .matrix { display: flex; align-items: stretch; }
+  .bkt { width: 10px; border: 2.5px solid #374151; }
+  .bkt.l { border-right: none; border-radius: 4px 0 0 4px; }
+  .bkt.r { border-left: none; border-radius: 0 4px 4px 0; }
+  .cells { display: grid; grid-template-columns: 68px 68px; grid-auto-rows: 54px; gap: 5px 7px; padding: 7px 9px; }
+  .cell { position: relative; display: flex; align-items: center; justify-content: center;
+    font-family: "SF Mono", Menlo, monospace; font-size: 18px; border-radius: 7px; cursor: ew-resize; touch-action: none;
+    user-select: none; background: #f7f9fb; border: 1px solid #eceff2; transition: background .1s; }
+  .cell:hover { background: #eef4fb; border-color: #cfe0f2; }
+  .cell.c1 { color: #2b6cb0; } .cell.c2 { color: #2f855a; }
+  .chev { position: absolute; top: 50%; transform: translateY(-50%); font-size: 10px; color: #b6c0cb;
+    opacity: 0; transition: opacity .1s; pointer-events: none; }
+  .cell:hover .chev { opacity: 1; }
+  .chev.l { left: 4px; } .chev.r { right: 4px; }
+  .status { font-size: 15px; font-weight: 600; padding: 7px 16px; border-radius: 20px; }
+  .status.ok { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; }
+  .status.no { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; }
+  .hint { font-size: 13px; color: #9ca3af; text-align: center; max-width: 320px; line-height: 1.5; }
+  #flag { position: absolute; top: 12px; right: 14px; font-size: 15px; font-weight: 700; color: #c53030;
+    opacity: 0; transition: opacity .15s; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="banner">
+    <span><b>Drag any matrix entry left or right</b> to change it — then watch the frame on the right.</span>
+    <button id="reset" style="margin-left:auto">Reset</button>
+  </div>
+  <div id="main">
+    <div id="left">
+      <div class="eq">
+        <span class="Rlabel">R&thinsp;=</span>
+        <div class="matrix">
+          <div class="bkt l"></div>
+          <div class="cells">
+            <div class="cell c1" data-i="0"><span class="chev l">◀</span><span class="v"></span><span class="chev r">▶</span></div>
+            <div class="cell c2" data-i="1"><span class="chev l">◀</span><span class="v"></span><span class="chev r">▶</span></div>
+            <div class="cell c1" data-i="2"><span class="chev l">◀</span><span class="v"></span><span class="chev r">▶</span></div>
+            <div class="cell c2" data-i="3"><span class="chev l">◀</span><span class="v"></span><span class="chev r">▶</span></div>
+          </div>
+          <div class="bkt r"></div>
+        </div>
+      </div>
+      <div class="status ok" id="status">valid rotation ✓</div>
+    </div>
+    <div id="right">
+      <div class="cap">The rotation it represents</div>
+      <div id="flag">✗ not a rotation</div>
+      <canvas id="c"></canvas>
+    </div>
+  </div>
+</div>
+<script>
+const STEP = 0.05, TOL = 0.03;
+let R = rot(40 * Math.PI/180);      // [a,b,c,d]
+function rot(t){ return [Math.cos(t), -Math.sin(t), Math.sin(t), Math.cos(t)]; }
+
+const cells = [...document.querySelectorAll('.cell')];
+let scrub = null;                    // { i, startX, startVal }
+const SENS = 0.006;                  // change per pixel dragged
+cells.forEach(cell => {
+  cell.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    const i = +cell.dataset.i;
+    scrub = { i, startX: e.clientX, startVal: R[i] };
+    cell.setPointerCapture(e.pointerId);
+  });
+  cell.addEventListener('pointermove', e => {
+    if (!scrub) return;
+    const v = scrub.startVal + (e.clientX - scrub.startX) * SENS;
+    R[scrub.i] = Math.max(-1.6, Math.min(1.6, v));
+    render();
+  });
+  const end = e => { scrub = null; try { cell.releasePointerCapture(e.pointerId); } catch (_) {} };
+  cell.addEventListener('pointerup', end);
+  cell.addEventListener('pointercancel', end);
+});
+document.getElementById('reset').onclick = () => { R = rot(40*Math.PI/180); render(); };
+
+const cv = document.getElementById('c'), cx = cv.getContext('2d');
+const right = document.getElementById('right'), flag = document.getElementById('flag');
+
+function render() {
+  // update matrix text
+  cells.forEach(cell => cell.querySelector('.v').textContent = R[+cell.dataset.i].toFixed(2));
+  // validity
+  const c1 = [R[0], R[2]], c2 = [R[1], R[3]];
+  const n1 = Math.hypot(...c1), n2 = Math.hypot(...c2);
+  const dot = c1[0]*c2[0] + c1[1]*c2[1], det = R[0]*R[3] - R[1]*R[2];
+  const ok = Math.abs(n1-1)<TOL && Math.abs(n2-1)<TOL && Math.abs(dot)<TOL && Math.abs(det-1)<TOL;
+  const st = document.getElementById('status');
+  st.className = 'status ' + (ok ? 'ok' : 'no');
+  st.textContent = ok ? 'valid rotation ✓' : 'not a rotation ✗';
+  right.style.background = ok ? '#ffffff' : '#fdeaea';
+  flag.style.opacity = ok ? 0 : 1;
+  draw(c1, c2, ok);
+}
+function draw(c1, c2, ok) {
+  const r = cv.getBoundingClientRect(), dpr = devicePixelRatio||1;
+  cv.width = r.width*dpr; cv.height = r.height*dpr; cx.setTransform(dpr,0,0,dpr,0,0);
+  const W = r.width, H = r.height, ox = W/2, oy = H/2, L = Math.min(W,H)*0.30;
+  cx.clearRect(0,0,W,H);
+  const ax = (dx, dy, col, w, lab) => {
+    cx.strokeStyle = col; cx.lineWidth = w; cx.fillStyle = col;
+    cx.beginPath(); cx.moveTo(ox,oy); cx.lineTo(ox+dx, oy-dy); cx.stroke();
+    const ang = Math.atan2(-dy, dx), h = 11, tx = ox+dx, ty = oy-dy;
+    cx.beginPath(); cx.moveTo(tx,ty);
+    cx.lineTo(tx-h*Math.cos(ang-.4), ty-h*Math.sin(ang-.4));
+    cx.lineTo(tx-h*Math.cos(ang+.4), ty-h*Math.sin(ang+.4)); cx.closePath(); cx.fill();
+    if (lab){ cx.font = '14px monospace'; cx.fillText(lab, tx+8, ty-6); }
+  };
+  // faint reference (identity) frame
+  const ref = ok ? '#e2e8f0' : '#f0d7d7';
+  ax(L, 0, ref, 2); ax(0, L, ref, 2);
+  // heading wedge based on the first column's angle
+  const ang = Math.atan2(c1[1], c1[0]);
+  cx.fillStyle = ok ? 'rgba(221,107,32,.14)' : 'rgba(197,48,48,.13)';
+  cx.beginPath(); cx.moveTo(ox,oy); cx.arc(ox, oy, L*0.5, -ang+0.34, -ang-0.34, true); cx.closePath(); cx.fill();
+  // the frame these columns define
+  ax(L*c1[0], L*c1[1], '#2b6cb0', 3, 'e₁');
+  ax(L*c2[0], L*c2[1], '#2f855a', 3, 'e₂');
+}
+window.addEventListener('resize', render);
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 · Tangent Space (SO(2))</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #fff; color: #2a2a2a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+  #banner { display: flex; align-items: center; gap: 10px; padding: 11px 18px;
+    border-bottom: 1px solid #e5e7eb; background: #fafbfc; font-size: 14px; color: #4b5563; }
+  .lead { font-weight: 600; color: #374151; margin-right: 2px; }
+  button { border: 1px solid #2b6cb0; background: #2b6cb0; color: #fff; border-radius: 9px;
+    padding: 9px 15px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  button:hover:not(:disabled) { background: #2c5aa0; }
+  button:disabled { background: #eef1f4; border-color: #e5e7eb; color: #b6bdc6; cursor: default; }
+  button.exp { border-color: #6b46c1; background: #6b46c1; } button.exp:hover:not(:disabled){ background:#5a37a8; }
+  button.ghost { background: #f4f5f6; border-color: #d1d5db; color: #4b5563; font-weight: 500; }
+  .hint { margin-left: auto; color: #9ca3af; font-size: 13px; }
+  #c { flex: 1; display: block; width: 100%; min-height: 0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="banner">
+    <span class="lead">Animate:</span>
+    <button id="bLog">log map ▶</button>
+    <button id="bExp" class="exp">exp map ▶</button>
+    <button id="bReset" class="ghost">Reset</button>
+    <span class="hint">drag the orange point around the circle to change θ</span>
+  </div>
+  <canvas id="c"></canvas>
+</div>
+<script>
+const cv = document.getElementById('c'), cx = cv.getContext('2d');
+let W, H, O, Rr;
+let theta = 1.1;                 // manifold point angle (tangent coordinate)
+let anim = null;                 // {a, from, to, t0, mode}
+
+function layout() {
+  const r = cv.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+  W = r.width; H = r.height; cv.width = W*dpr; cv.height = H*dpr; cx.setTransform(dpr,0,0,dpr,0,0);
+  Rr = Math.min(W*0.5, H) * 0.30;
+  O = { x: W*0.40, y: H*0.60 };
+}
+const circPt = phi => [O.x + Rr*Math.cos(phi), O.y - Rr*Math.sin(phi)];
+const tanPt  = h   => [O.x + Rr, O.y - h*Rr];        // point on tangent line at coord h (arc units)
+
+function head(a, b, col) {                            // arrowhead at b, pointing from a→b
+  const ang = Math.atan2(b[1]-a[1], b[0]-a[0]), h = 9;
+  cx.fillStyle = col; cx.beginPath(); cx.moveTo(b[0], b[1]);
+  cx.lineTo(b[0]-h*Math.cos(ang-.4), b[1]-h*Math.sin(ang-.4));
+  cx.lineTo(b[0]-h*Math.cos(ang+.4), b[1]-h*Math.sin(ang+.4)); cx.closePath(); cx.fill();
+}
+function arc(phiA, phiB, col, w) {
+  cx.strokeStyle = col; cx.lineWidth = w; cx.beginPath();
+  const n = 60; for (let i=0;i<=n;i++){ const p = phiA + (phiB-phiA)*i/n, q = circPt(p);
+    i? cx.lineTo(q[0],q[1]) : cx.moveTo(q[0],q[1]); } cx.stroke();
+}
+
+function draw() {
+  layout();
+  cx.clearRect(0,0,W,H);
+
+  // tangent line (the tangent space ℝ¹) — vertical, through the identity
+  cx.strokeStyle = '#c7ccd3'; cx.setLineDash([6,5]); cx.lineWidth = 1.6;
+  cx.beginPath(); cx.moveTo(O.x+Rr, O.y - Rr*2.1); cx.lineTo(O.x+Rr, O.y + Rr*2.1); cx.stroke();
+  cx.setLineDash([]);
+  cx.fillStyle = '#9aa2ab'; cx.font = '12px sans-serif';
+  cx.fillText('tangent space  (ℝ¹)', O.x+Rr+10, O.y - Rr*2.1 + 14);
+
+  // circle (the manifold, SO(2))
+  cx.strokeStyle = '#d1d5db'; cx.lineWidth = 2; cx.beginPath(); cx.arc(O.x,O.y,Rr,0,7); cx.stroke();
+  cx.fillStyle = '#9ca3af'; cx.fillText('manifold  SO(2)', O.x - Rr, O.y - Rr - 12);
+
+  // identity
+  const id = circPt(0);
+  cx.fillStyle = '#2f855a'; cx.beginPath(); cx.arc(id[0], id[1], 5, 0, 7); cx.fill();
+  cx.fillStyle = '#2f855a'; cx.font = '12px monospace'; cx.fillText('identity', id[0]+9, id[1]+18);
+
+  const showAnim = anim !== null;
+  const a = showAnim ? anim.a : theta;               // peel angle currently on the circle
+
+  // faint orange target (manifold distance)
+  arc(0, theta, '#f0d9c4', 3);
+  // tangent-space line: solid by default, faded only while exp is wrapping it back
+  const tangCol = (anim && anim.mode === 'exp') ? '#e3d4f5' : '#6b46c1';
+  cx.strokeStyle = tangCol; cx.lineWidth = 3.5;
+  cx.beginPath(); cx.moveTo(...tanPt(0)); cx.lineTo(...tanPt(theta)); cx.stroke();
+
+  // the unrolling "string": wrapped arc [0..a] (orange) + straight tangent part (violet)
+  arc(0, a, '#dd6b20', 3.5);
+  const pk = circPt(a);
+  const t = [-Math.sin(a), -Math.cos(a)];            // unroll tangent direction (canvas coords)
+  const end = [pk[0] + t[0]*(theta-a)*Rr, pk[1] + t[1]*(theta-a)*Rr];
+  cx.strokeStyle = '#6b46c1'; cx.lineWidth = 3.5;
+  cx.beginPath(); cx.moveTo(pk[0], pk[1]); cx.lineTo(end[0], end[1]); cx.stroke();
+
+  // markers: X on manifold, log(X) on tangent line
+  const X = circPt(theta), L = tanPt(theta);
+  cx.fillStyle = '#dd6b20'; cx.beginPath(); cx.arc(X[0],X[1],7,0,7); cx.fill();
+  cx.font = '13px monospace'; cx.fillStyle = '#dd6b20'; cx.fillText('X = exp(τ)', X[0]+11, X[1]-8);
+  cx.fillStyle = '#6b46c1'; cx.beginPath(); cx.arc(L[0],L[1],7,0,7); cx.fill();
+  cx.fillText('τ = log(X)', L[0]+12, L[1]+4);
+
+  // moving endpoint of the string during animation
+  if (showAnim) { cx.fillStyle = '#111'; cx.beginPath(); cx.arc(end[0], end[1], 5.5, 0, 7); cx.fill(); }
+
+  // θ readout
+  cx.fillStyle = '#6b7280'; cx.font = '13px monospace';
+  cx.fillText('θ = ' + theta.toFixed(2) + ' rad', 16, H - 16);
+}
+
+// ---- animation ----
+function startAnim(mode) {
+  // log: string on circle (a=θ) unrolls to tangent (a→0)
+  // exp: string on tangent (a=0) wraps onto circle (a→θ)
+  anim = { mode, from: mode==='log'? theta : 0, to: mode==='log'? 0 : theta, t0: performance.now(), a: 0 };
+  anim.a = anim.from; syncButtons();
+}
+function tick(now) {
+  if (anim) {
+    const p = Math.min(1, (now - anim.t0) / 1300);
+    const e = p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;  // ease in-out
+    anim.a = anim.from + (anim.to - anim.from) * e;
+    if (p >= 1) { anim = null; syncButtons(); }
+  }
+  draw();
+  requestAnimationFrame(tick);
+}
+const bLog = document.getElementById('bLog'), bExp = document.getElementById('bExp');
+function syncButtons() { const busy = anim !== null; bLog.disabled = busy; bExp.disabled = busy; }
+bLog.onclick = () => startAnim('log');
+bExp.onclick = () => startAnim('exp');
+document.getElementById('bReset').onclick = () => { theta = 1.1; anim = null; syncButtons(); };
+
+// dragging the point on the circle
+let drag = false;
+function setTheta(e) { const r = cv.getBoundingClientRect();
+  let a = Math.atan2(O.y - (e.clientY-r.top), (e.clientX-r.left) - O.x);
+  theta = Math.max(-2.0, Math.min(2.0, a)); }
+cv.addEventListener('pointerdown', e => { if (anim) return; drag = true; setTheta(e); });
+window.addEventListener('pointermove', e => { if (drag) setTheta(e); });
+window.addEventListener('pointerup', () => drag = false);
+window.addEventListener('resize', draw);
+syncButtons(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>
