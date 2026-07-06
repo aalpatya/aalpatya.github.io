@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1 · Functions and Optimisation</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #fff; color: #2a2a2a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+  /* top banner of step buttons */
+  #banner { display: flex; align-items: center; gap: 10px; padding: 11px 16px;
+    border-bottom: 1px solid #e5e7eb; background: #fafbfc; }
+  .lead { font-size: 14.5px; color: #374151; font-weight: 700; margin-right: 4px; }
+  .lead .arrow { color: #2b6cb0; }
+  .step { display: flex; align-items: center; gap: 8px; }
+  .num { width: 22px; height: 22px; border-radius: 50%; background: #eef1f4; color: #6b7280;
+    font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  button { border: 1px solid #2b6cb0; background: #2b6cb0; color: #fff; border-radius: 9px;
+    padding: 9px 15px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  button:hover:not(:disabled) { background: #2c5aa0; }
+  button:disabled { background: #eef1f4; border-color: #e5e7eb; color: #b6bdc6; cursor: default; }
+  button.ghost { background: #f4f5f6; border-color: #d1d5db; color: #4b5563; font-weight: 500; }
+  button.pulse { animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{ box-shadow:0 0 0 0 rgba(43,108,176,.45);} 50%{ box-shadow:0 0 0 6px rgba(43,108,176,0);} }
+  .sep { width: 1px; height: 26px; background: #e5e7eb; }
+
+  #main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  #left { flex: 0 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: 18px; padding: 14px 16px; border-bottom: 1px solid #e5e7eb; }
+  #cost { flex: 1; min-height: 0; position: relative; }
+  #cost canvas { display: block; width: 100%; height: 100%; }
+  .cap3d { position: absolute; top: 9px; left: 12px; font-size: 11px; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: .7px; pointer-events: none; }
+
+  .pcol { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .cap { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: #9ca3af; }
+  .flowar { font-size: 26px; color: #cbd2d9; transition: color .2s; }
+  .flowar.hot { color: #2b6cb0; }
+
+  /* editable X vector */
+  .xrow { display: flex; align-items: center; gap: 8px; }
+  .vlabel { font-family: Georgia, serif; font-style: italic; font-size: 20px; color: #111; }
+  .vecbox { display: inline-flex; align-items: stretch; }
+  .bk { width: 7px; border: 2px solid #4b5563; }
+  .bk.l { border-right: none; border-radius: 4px 0 0 4px; }
+  .bk.r { border-left: none; border-radius: 0 4px 4px 0; }
+  .vcells { display: flex; flex-direction: column; gap: 6px; padding: 7px 9px; }
+  .vcell { width: 60px; text-align: center; font-family: "SF Mono", Menlo, monospace; font-size: 16px;
+    color: #b7791f; cursor: ew-resize; user-select: none; touch-action: none;
+    background: #fbfaf5; border: 1px solid #efe7cf; border-radius: 6px; padding: 4px 2px; }
+  .vcell:hover { background: #fdf6e3; border-color: #e6d9b0; }
+
+  .valid { font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px;
+    background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; }
+
+  /* copies emerge from the input (max-width reflow pushes the input left),
+     then fly into the function box on gradient */
+  .perturbs { display: flex; flex-direction: column; gap: 8px; align-items: center; overflow: hidden;
+    max-width: 0; opacity: 0; transition: max-width .45s ease, opacity .3s; }
+  .perturbs.show { max-width: 105px; opacity: 1; }
+  .perturbs .katex { font-size: 0.7em; }
+  .poutputs .katex { font-size: 0.85em; }
+  #po1 { color: #e53e3e; } #po2 { color: #2f855a; }
+  .perturbs.flow { overflow: visible; }
+  .pv { display: flex; flex-direction: column; align-items: center; gap: 2px;
+    transition: transform .55s ease, opacity .5s; }
+  .plab { font-size: 11px; font-weight: 700; font-family: "SF Mono", Menlo, monospace; white-space: nowrap; }
+  .perturbs.flow .pv { transform: translateX(95px); opacity: 0; }
+  .perturbs.flow .pv:last-child { transition-delay: .06s; }
+
+  .fbox { width: 72px; height: 60px; border: 2px solid #2b6cb0; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-style: italic;
+    font-size: 26px; color: #2b6cb0; background: rgba(43,108,176,.06); }
+
+  .poutputs { display: flex; flex-direction: column; gap: 8px; align-items: center; margin-top: 4px; }
+  #outCol { min-width: 150px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="banner">
+    <span class="lead">Try it — click each step <span class="arrow">▶</span></span>
+    <div class="step"><span class="num">1</span><button id="bPerturb">Perturb</button></div>
+    <div class="step"><span class="num">2</span><button id="bGrad" disabled>Calculate Gradient</button></div>
+    <div class="step"><span class="num">3</span><button id="bStep" disabled>Gradient Descent Step</button></div>
+    <div class="sep"></div>
+    <button id="bReset" class="ghost">Reset</button>
+  </div>
+  <div id="main">
+    <div id="left">
+      <!-- input column: X vector, valid box, perturbed copies -->
+      <div class="pcol" id="inCol">
+        <div class="cap">input</div>
+        <div class="xrow">
+          <span class="vlabel">X =</span>
+          <div class="vecbox"><div class="bk l"></div><div class="vcells">
+            <div class="vcell" data-i="0"></div>
+            <div class="vcell" data-i="1"></div>
+          </div><div class="bk r"></div></div>
+        </div>
+        <div class="valid">valid input ✓</div>
+      </div>
+
+      <div class="perturbs" id="perturbs">
+        <div class="pv"><span class="plab" style="color:#e53e3e">perturb x₁</span><div id="pv1"></div></div>
+        <div class="pv"><span class="plab" style="color:#2f855a">perturb x₂</span><div id="pv2"></div></div>
+      </div>
+
+      <div class="flowar">→</div>
+
+      <div class="pcol">
+        <div class="cap">function</div>
+        <div class="fbox">f(x)</div>
+      </div>
+
+      <div class="flowar">→</div>
+
+      <div class="pcol" id="outCol">
+        <div class="cap" id="outCap">output</div>
+        <div id="fout"></div>
+        <div class="poutputs" id="poutputs">
+          <div id="po1"></div>
+          <div id="po2"></div>
+        </div>
+        <div id="gradbox"></div>
+      </div>
+    </div>
+
+    <div id="cost">
+      <div class="cap3d">Cost surface&nbsp;·&nbsp;height = f(X)</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// elongated convex bowl (a long valley): f = ½(A x₁² + B x₂²)
+const A = 1.7, B = 1.35, R = 2.0, HS = 0.55, EPS = 0.1, ETA = 0.2;
+function f(x1, x2){ return 0.5*(A*x1*x1 + B*x2*x2); }
+function grad(x1, x2){ return [A*x1, B*x2]; }
+const RED = '#e53e3e', GRN = '#2f855a';
+
+let stage = 0;
+const S = { x1: 1.35, x2: -1.1, tx: 1.35, tx2: -1.1, moving: false };
+
+// ---------- symbolic (left) ----------
+const cells = [...document.querySelectorAll('.vcell')];
+const pv1 = document.getElementById('pv1'), pv2 = document.getElementById('pv2'),
+      gradbox = document.getElementById('gradbox');
+const fout = document.getElementById('fout'), po1 = document.getElementById('po1'),
+      po2 = document.getElementById('po2'), poutputs = document.getElementById('poutputs');
+const perturbs = document.getElementById('perturbs'), outCap = document.getElementById('outCap');
+const flowars = [...document.querySelectorAll('.flowar')];
+const bP = document.getElementById('bPerturb'), bG = document.getElementById('bGrad'),
+      bS = document.getElementById('bStep');
+
+function tex(el, s){ if (window.katex) { try { katex.render(s, el, { throwOnError:false }); } catch(e){} } }
+function updateXcells(){ cells[0].textContent = S.x1.toFixed(2); cells[1].textContent = S.x2.toFixed(2); }
+function renderPerturbs(){
+  const d = EPS.toFixed(2);
+  tex(pv1, `\\begin{bmatrix} ${S.x1.toFixed(2)}\\,\\textcolor{${RED}}{+\\,${d}} \\\\ ${S.x2.toFixed(2)} \\end{bmatrix}`);
+  tex(pv2, `\\begin{bmatrix} ${S.x1.toFixed(2)} \\\\ ${S.x2.toFixed(2)}\\,\\textcolor{${GRN}}{+\\,${d}} \\end{bmatrix}`);
+}
+function renderGrad(){ const g = grad(S.x1, S.x2);
+  tex(gradbox, `\\nabla f = \\begin{bmatrix} \\textcolor{${RED}}{${g[0].toFixed(2)}} \\\\ \\textcolor{${GRN}}{${g[1].toFixed(2)}} \\end{bmatrix}`);
+}
+function updateFout(){ tex(fout, `f(X) = \\textcolor{#b7791f}{${f(S.x1, S.x2).toFixed(2)}}`); }
+function renderPoutputs(){
+  tex(po1, `f(x{+}\\delta x_1) = ${f(S.x1+EPS, S.x2).toFixed(2)}`);
+  tex(po2, `f(x{+}\\delta x_2) = ${f(S.x1, S.x2+EPS).toFixed(2)}`);
+}
+
+function setStage(s){
+  stage = s;
+  bP.disabled = s !== 0; bG.disabled = s !== 1; bS.disabled = s !== 2;
+  [bP, bG, bS].forEach(b => b.classList.remove('pulse'));
+  (s === 0 ? bP : s === 1 ? bG : bS).classList.add('pulse');
+  if (s >= 1) { renderPerturbs(); perturbs.classList.add('show'); } else perturbs.classList.remove('show');
+  perturbs.classList.toggle('flow', s >= 2);
+  if (s === 1) renderPoutputs();
+  if (s === 2) renderGrad();
+  // the output slot shows one of: f(X)  →  perturbed outputs  →  ∇f
+  fout.style.display     = (s === 0) ? '' : 'none';
+  poutputs.style.display = (s === 1) ? '' : 'none';
+  gradbox.style.display  = (s === 2) ? '' : 'none';
+  outCap.textContent = (s === 2) ? 'gradient' : 'output';
+  flowars.forEach(a => a.classList.toggle('hot', s >= 2));
+  recompute3D();
+}
+
+// drag the X vector elements (horizontal scrub)
+let scrub = null;
+cells.forEach(cell => {
+  cell.addEventListener('pointerdown', e => { e.preventDefault();
+    const i = +cell.dataset.i; scrub = { i, x: e.clientX, v: i === 0 ? S.x1 : S.x2 };
+    cell.setPointerCapture(e.pointerId); });
+  cell.addEventListener('pointermove', e => {
+    if (!scrub) return;
+    let val = Math.max(-2, Math.min(2, scrub.v + (e.clientX - scrub.x) * 0.01));
+    if (scrub.i === 0) S.x1 = val; else S.x2 = val;
+    S.tx = S.x1; S.tx2 = S.x2; updateXcells(); setStage(0);
+  });
+  const end = e => { scrub = null; try { cell.releasePointerCapture(e.pointerId); } catch(_){} };
+  cell.addEventListener('pointerup', end); cell.addEventListener('pointercancel', end);
+});
+
+bP.onclick = () => setStage(1);
+bG.onclick = () => {
+  setStage(2);
+  // once the copies have flown into f, collapse the slot so the input slides back
+  setTimeout(() => { if (stage === 2) perturbs.classList.remove('show'); }, 600);
+};
+let stepping = false;
+bS.onclick = () => {
+  if (stepping) return; stepping = true;
+  // fly the gradient vector onto the original input, then take the step
+  const gb = gradbox.getBoundingClientRect(), inr = document.getElementById('inCol').getBoundingClientRect();
+  const dx = (inr.left + inr.width/2) - (gb.left + gb.width/2);
+  const dy = (inr.top + inr.height/2) - (gb.top + gb.height/2);
+  gradbox.style.transition = 'transform .6s ease, opacity .6s';
+  gradbox.style.transform = `translate(${dx}px, ${dy}px)`;
+  gradbox.style.opacity = '0.15';
+  setTimeout(() => {
+    gradbox.style.transition = ''; gradbox.style.transform = ''; gradbox.style.opacity = '';
+    const g = grad(S.x1, S.x2);
+    S.tx = Math.max(-R, Math.min(R, S.x1 - ETA*g[0]));
+    S.tx2 = Math.max(-R, Math.min(R, S.x2 - ETA*g[1]));
+    S.moving = true; setStage(0); stepping = false;
+  }, 640);
+};
+document.getElementById('bReset').onclick = () => { S.x1 = 1.35; S.x2 = -1.1; S.tx = S.x1; S.tx2 = S.x2; updateXcells(); setStage(0); };
+
+// ---------- 3D cost surface (right) ----------
+const host = document.getElementById('cost');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(devicePixelRatio); renderer.setClearColor(0xffffff, 1); host.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+const dl = new THREE.DirectionalLight(0xffffff, 0.45); dl.position.set(4,6,3); scene.add(dl);
+let oth = 1.0, oph = 1.02, orad = 5, odrag = false, opx = 0, opy = 0;
+function camUpdate(){ const s = Math.sin(oph);
+  camera.position.set(orad*s*Math.sin(oth), orad*Math.cos(oph)+1.4, orad*s*Math.cos(oth)); camera.lookAt(0,1,0); }
+host.addEventListener('pointerdown', e => { if (e.target.tagName==='CANVAS'){ odrag=true; opx=e.clientX; opy=e.clientY; } });
+window.addEventListener('pointermove', e => { if (!odrag) return;
+  oth -= (e.clientX-opx)*0.008; oph = Math.min(1.5, Math.max(0.15, oph-(e.clientY-opy)*0.008)); opx=e.clientX; opy=e.clientY; camUpdate(); });
+window.addEventListener('pointerup', () => odrag = false);
+host.addEventListener('wheel', e => { e.preventDefault(); orad = Math.min(16, Math.max(4.5, orad*(1+Math.sign(e.deltaY)*0.08))); camUpdate(); }, { passive:false });
+
+const N = 52, surfGeo = new THREE.BufferGeometry();
+const pos = [], col = [], idx = [];
+const cLo = new THREE.Color(0x2c9aa0), cHi = new THREE.Color(0xdd8a2b), fmax = f(R,R);
+for (let i=0;i<=N;i++) for (let j=0;j<=N;j++){ const x1=-R+2*R*i/N, x2=-R+2*R*j/N, h=f(x1,x2);
+  pos.push(x1, HS*h, x2); const c = cLo.clone().lerp(cHi, h/fmax); col.push(c.r,c.g,c.b); }
+for (let i=0;i<N;i++) for (let j=0;j<N;j++){ const a=i*(N+1)+j, b=a+1, cc=a+(N+1), d=cc+1; idx.push(a,cc,b,b,cc,d); }
+surfGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos,3));
+surfGeo.setAttribute('color', new THREE.Float32BufferAttribute(col,3)); surfGeo.setIndex(idx); surfGeo.computeVertexNormals();
+scene.add(new THREE.Mesh(surfGeo, new THREE.MeshStandardMaterial({ vertexColors:true, transparent:true, opacity:0.6, side:THREE.DoubleSide, metalness:0.05, roughness:0.85 })));
+scene.add(new THREE.Mesh(surfGeo, new THREE.MeshBasicMaterial({ color:0xaab4bf, wireframe:true, transparent:true, opacity:0.28 })));
+scene.add(new THREE.GridHelper(2*R, 8, 0xd1d5db, 0xe5e7eb));
+function ball(c,r){ return new THREE.Mesh(new THREE.SphereGeometry(r,20,20), new THREE.MeshBasicMaterial({color:c})); }
+const mX = ball(0xc99a00, 0.08);
+const mP = [ball(0xe53e3e, 0.055), ball(0x2f855a, 0.055)];
+scene.add(mX, ...mP);
+function line(c){ const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]),
+  new THREE.LineBasicMaterial({color:c,transparent:true,opacity:0.9})); scene.add(l); return l; }
+const fd1 = line(0xe53e3e), fd2 = line(0x2f855a);
+const stepArrow = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(), 1, 0x2b6cb0, 0.28, 0.18); scene.add(stepArrow);
+function setLine(l,a,b){ l.geometry.setFromPoints([a,b]); l.geometry.attributes.position.needsUpdate = true; }
+const sp = (x1,x2) => new THREE.Vector3(x1, HS*f(x1,x2), x2);
+
+function recompute3D(){
+  updateFout();
+  const g = grad(S.x1, S.x2), P = sp(S.x1, S.x2);
+  mX.position.copy(P);
+  const pts = [sp(S.x1+EPS, S.x2), sp(S.x1, S.x2+EPS)];
+  mP.forEach((m,i) => { m.position.copy(pts[i]); m.visible = stage >= 1; });
+  fd1.visible = fd2.visible = stage >= 1;
+  if (stage >= 1){ setLine(fd1, P, pts[0]); setLine(fd2, P, pts[1]); }
+  const Pn = sp(S.x1-ETA*g[0], S.x2-ETA*g[1]), d = Pn.clone().sub(P), len = Math.max(0.001, d.length());
+  stepArrow.visible = stage >= 2;
+  stepArrow.position.copy(P); stepArrow.setDirection(d.clone().normalize());
+  stepArrow.setLength(len, Math.min(0.28,len*0.4), Math.min(0.18,len*0.28));
+}
+function resize(){ const r = host.getBoundingClientRect(); renderer.setSize(r.width, r.height); camera.aspect = r.width/r.height; camera.updateProjectionMatrix(); }
+window.addEventListener('resize', resize);
+function tick(){ requestAnimationFrame(tick);
+  if (S.moving){ S.x1 += (S.tx-S.x1)*0.14; S.x2 += (S.tx2-S.x2)*0.14;
+    if (Math.abs(S.tx-S.x1)<2e-3 && Math.abs(S.tx2-S.x2)<2e-3){ S.x1=S.tx; S.x2=S.tx2; S.moving=false; }
+    updateXcells(); recompute3D(); }
+  renderer.render(scene, camera); }
+camUpdate(); resize(); updateXcells(); setStage(0); tick();
+</script>
+</body>
+</html>

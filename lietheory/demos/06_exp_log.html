@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>exp / log — SO(2) &amp; SO(3)</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #fff; color: #2a2a2a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+  #banner { display: flex; align-items: center; gap: 10px; padding: 11px 18px;
+    border-bottom: 1px solid #e5e7eb; background: #fafbfc; font-size: 14px; color: #4b5563; }
+  #desc { padding: 9px 18px; border-bottom: 1px solid #e5e7eb; background: #fff;
+    font-size: 13.5px; color: #4b5563; line-height: 1.45; }
+  .lead { font-weight: 600; color: #374151; }
+  button { border: 1px solid #2b6cb0; background: #2b6cb0; color: #fff; border-radius: 9px;
+    padding: 9px 15px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  button:hover:not(:disabled) { background: #2c5aa0; }
+  button:disabled { background: #eef1f4; border-color: #e5e7eb; color: #b6bdc6; cursor: default; }
+  button.exp { border-color: #6b46c1; background: #6b46c1; } button.exp:hover:not(:disabled){ background:#5a37a8; }
+  button.ghost { background: #f4f5f6; border-color: #d1d5db; color: #4b5563; font-weight: 500; }
+  .hint { margin-left: auto; color: #9ca3af; font-size: 13px; }
+  /* pulse the animation buttons to invite a click (paused while disabled) */
+  @keyframes pulseBlue { 0%,100%{ box-shadow:0 0 0 0 rgba(43,108,176,.45); } 50%{ box-shadow:0 0 0 6px rgba(43,108,176,0); } }
+  @keyframes pulseViolet { 0%,100%{ box-shadow:0 0 0 0 rgba(107,70,193,.45); } 50%{ box-shadow:0 0 0 6px rgba(107,70,193,0); } }
+  #bLog:not(:disabled) { animation: pulseBlue 1.4s ease-in-out infinite; }
+  #bExp:not(:disabled) { animation: pulseViolet 1.4s ease-in-out infinite; }
+  #main { flex: 1; display: flex; min-height: 0; }
+  .panel { flex: 1; min-width: 0; position: relative; }
+  .panel + .panel { border-left: 1px solid #e5e7eb; }
+  .panel > canvas { display: block; width: 100%; height: 100%; }
+  .plabel { position: absolute; top: 10px; left: 12px; font-size: 12px; color: #6b7280;
+    text-transform: uppercase; letter-spacing: .7px; pointer-events: none; z-index: 4; }
+  .ovl { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: hidden; }
+  .tag { position: absolute; transform: translate(-50%, -50%); font: 12px "SF Mono", Menlo, monospace;
+    padding: 0 3px; white-space: nowrap; background: rgba(255,255,255,.7); border-radius: 3px; }
+  .tag .katex { font-size: 1.02em; }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <div id="banner">
+    <span class="lead">Animate:</span>
+    <button id="bLog">log</button>
+    <button id="bExp" class="exp">exp</button>
+    <button id="bReset" class="ghost">Reset</button>
+  </div>
+  <div id="desc">For the <b>SO(2)</b> manifold, the tangent space at the identity is visualised as a line.<br>
+    For the <b>SO(3)</b> manifold, it is visualised as a plane (although it is really a 3D space).</div>
+  <div id="main">
+    <div class="panel" id="so2">
+      <div class="plabel">SO(2)</div>
+      <canvas id="c2"></canvas>
+      <div class="ovl" id="ovl2"></div>
+    </div>
+    <div class="panel" id="so3">
+      <div class="plabel">SO(3)</div>
+      <div class="ovl" id="ovl3"></div>
+    </div>
+  </div>
+  <div id="view">
+    <div class="k"><b style="color:#38a169">Green</b> = Lie algebra (tangent space at Identity element)</div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ===== shared animation clock (drives BOTH panels) =====
+let anim = null;            // { mode:'log'|'exp', t0 }
+let animP = 0;
+function startAnim(mode){ anim = { mode, t0: performance.now() }; animP = 0; syncButtons(); }
+const bLog = document.getElementById('bLog'), bExp = document.getElementById('bExp');
+function syncButtons(){ const busy = !!anim; bLog.disabled = busy; bExp.disabled = busy; }
+bLog.onclick = () => startAnim('log');
+bExp.onclick = () => startAnim('exp');
+document.getElementById('bReset').onclick = () => { theta = 2.0; tau.set(0,1.3, 0.9); anim=null; syncButtons(); updateSO3(); };
+
+// ===== helpers =====
+function arrow2(cx, ox, oy, dx, dy, col, w, lab) {
+  cx.strokeStyle = col; cx.fillStyle = col; cx.lineWidth = w;
+  cx.beginPath(); cx.moveTo(ox, oy); cx.lineTo(ox+dx, oy-dy); cx.stroke();
+  const a = Math.atan2(-dy, dx), h = 9, tx = ox+dx, ty = oy-dy;
+  cx.beginPath(); cx.moveTo(tx, ty);
+  cx.lineTo(tx-h*Math.cos(a-.4), ty-h*Math.sin(a-.4));
+  cx.lineTo(tx-h*Math.cos(a+.4), ty-h*Math.sin(a+.4)); cx.closePath(); cx.fill();
+  if (lab){ cx.font = '12px monospace'; cx.fillText(lab, tx+7, ty-5); }
+}
+function fitCanvas(cv){ const r = cv.getBoundingClientRect(), dpr = devicePixelRatio||1;
+  cv.width = Math.max(1,r.width*dpr); cv.height = Math.max(1,r.height*dpr);
+  const c = cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); return { c, W:r.width, H:r.height }; }
+// KaTeX-rendered floating label
+function mathTag(container, latex, color){
+  const d = document.createElement('div'); d.className = 'tag'; d.style.color = color;
+  if (window.katex) { try { katex.render(latex, d, { throwOnError:false }); } catch(e){ d.textContent = latex; } }
+  else d.textContent = latex;
+  container.appendChild(d); return d;
+}
+
+// ================= SO(2) =================
+let theta = 2.0;
+const c2 = document.getElementById('c2');
+const ovl2 = document.getElementById('ovl2');
+const t2E = mathTag(ovl2, '\\varepsilon', '#2f855a');
+const t2X = mathTag(ovl2, 'X = \\exp(\\tau^{\\wedge})', '#dd6b20');
+const t2T = mathTag(ovl2, '\\tau^{\\wedge} = \\log(X)', '#6b46c1');
+function placeSO2Labels(){ const g = c2._lab; if(!g) return;
+  const put = (el, p) => { el.style.left = p[0]+'px'; el.style.top = p[1]+'px'; };
+  put(t2E, g.eps); put(t2X, g.X); put(t2T, g.tau); }
+function drawSO2() {
+  const { c, W, H } = fitCanvas(c2);
+  const R = Math.min(W*0.62, H)*0.28, O = { x: W*0.42, y: H*0.54 };
+  c.clearRect(0,0,W,H);
+  const circPt = phi => [O.x+R*Math.cos(phi), O.y-R*Math.sin(phi)];
+  const arc = (p0,p1,col,w) => { c.strokeStyle=col; c.lineWidth=w; c.beginPath();
+    const n=60; for(let i=0;i<=n;i++){ const p=p0+(p1-p0)*i/n, q=circPt(p); i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]); } c.stroke(); };
+  // tangent line
+  c.strokeStyle='#68d391'; c.lineWidth=1.6;
+  c.beginPath(); c.moveTo(O.x+R,O.y-R*2.0); c.lineTo(O.x+R,O.y+R*2.0); c.stroke(); c.setLineDash([]);
+  c.fillStyle='#68d391'; c.font='12px sans-serif';
+  // circle + identity
+  c.strokeStyle='#d1d5db'; c.lineWidth=2; c.beginPath(); c.arc(O.x,O.y,R,0,7); c.stroke();
+  c.fillStyle='#2f855a'; c.beginPath(); c.arc(O.x+R,O.y,5,0,7); c.fill();
+
+  const mode = anim ? anim.mode : 'rest';
+  const a = anim ? (mode==='log' ? theta*(1-animP) : theta*animP) : theta;   // peel angle
+  arc(0, theta, '#f0d9c4', 3);                                               // faint orange target
+  // tangent-space line: solid unless exp is wrapping it back
+  c.strokeStyle = (mode==='exp') ? '#e3d4f5' : '#6b46c1'; c.lineWidth=3.5;
+  c.beginPath(); c.moveTo(O.x+R,O.y); c.lineTo(O.x+R, O.y-theta*R); c.stroke();
+  // unrolling string: wrapped arc (orange) + straight involute (violet)
+  arc(0, a, '#dd6b20', 3.5);
+  const pk = circPt(a), t = [-Math.sin(a), -Math.cos(a)];
+  const end = [pk[0]+t[0]*(theta-a)*R, pk[1]+t[1]*(theta-a)*R];
+  c.strokeStyle='#6b46c1'; c.lineWidth=3.5; c.beginPath(); c.moveTo(pk[0],pk[1]); c.lineTo(end[0],end[1]); c.stroke();
+  // markers
+  const X = circPt(theta), L = [O.x+R, O.y-theta*R];
+  c.fillStyle='#dd6b20'; c.beginPath(); c.arc(X[0],X[1],7,0,7); c.fill();
+  c.fillStyle='#6b46c1'; c.beginPath(); c.arc(L[0],L[1],6,0,7); c.fill();
+  if (anim){ c.fillStyle='#111'; c.beginPath(); c.arc(end[0],end[1],5,0,7); c.fill(); }
+  c.fillStyle='#6b7280'; c.font='12px monospace'; c.fillText('θ = '+theta.toFixed(2), W-84, H-14);
+  c2._geo = { O, R };
+  c2._lab = { eps:[O.x+R+12, O.y+16], X:[X[0]+38, X[1]-12], tau:[L[0]+46, L[1]] };
+}
+let drag2 = false;
+function setTheta(e){ const g=c2._geo; if(!g||anim) return; const r=c2.getBoundingClientRect();
+  theta = Math.max(-2.0, Math.min(2.0, Math.atan2(g.O.y-(e.clientY-r.top), (e.clientX-r.left)-g.O.x))); }
+c2.addEventListener('pointerdown', e=>{ if(anim) return; drag2=true; setTheta(e); });
+window.addEventListener('pointermove', e=>{ if(drag2) setTheta(e); });
+window.addEventListener('pointerup', ()=>drag2=false);
+
+// ================= SO(3) =================
+const host3 = document.getElementById('so3'), ovl3 = document.getElementById('ovl3');
+const E = new THREE.Vector3(1,0,0), Rr = 1.4;
+const rMain = new THREE.WebGLRenderer({ antialias:true }); rMain.setPixelRatio(devicePixelRatio);
+rMain.setClearColor(0xffffff,1); host3.appendChild(rMain.domElement);
+const sMain = new THREE.Scene(); const camMain = new THREE.PerspectiveCamera(45,1,0.1,100);
+sMain.add(new THREE.AmbientLight(0xffffff,0.9));
+const dl1 = new THREE.DirectionalLight(0xffffff,0.5); dl1.position.set(3,5,4); sMain.add(dl1);
+// shared sphere (matches 03_manifold_so2.html), rotated 90° about the vertical axis
+const sphereGeo = new THREE.SphereGeometry(Rr, 48, 48);
+const sphere = new THREE.Mesh(sphereGeo,
+  new THREE.MeshStandardMaterial({ color:0x7fb3e0, transparent:true, opacity:0.4, metalness:0.1, roughness:0.6, wireframe:false }));
+sphere.add(new THREE.LineSegments(new THREE.WireframeGeometry(sphereGeo), new THREE.LineBasicMaterial({ color:0xcccccc })));
+sMain.add(sphere);
+const planeQ = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1), E);
+const plane = new THREE.Mesh(new THREE.PlaneGeometry(4.0,4.0),
+  new THREE.MeshBasicMaterial({ color:0x68d391, transparent:true, opacity:0.3, side:THREE.DoubleSide, depthWrite:false }));
+plane.position.copy(E).multiplyScalar(Rr); plane.quaternion.copy(planeQ); sMain.add(plane);
+function planeGrid(size, div, color){
+  const pts=[], h=size/2, step=size/div;
+  for(let i=0;i<=div;i++){ const t=-h+i*step; pts.push(t,-h,0.003, t,h,0.003, -h,t,0.003, h,t,0.003); }
+  const g=new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(pts,3));
+  return new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color, transparent:true, opacity:0.5 }));
+}
+plane.add(planeGrid(4.0, 16, 0x66b98c));
+const epsM = new THREE.Mesh(new THREE.SphereGeometry(0.055,16,16), new THREE.MeshBasicMaterial({color:0x2f855a})); epsM.position.copy(E).multiplyScalar(Rr); sMain.add(epsM);
+// ---- line/vector thickness (tweak TH) ----
+const TH = 0.028;
+function setTube(mesh, pts, r){ if (pts.length < 2){ mesh.visible=false; return; } mesh.visible=true;
+  const curve = new THREE.CatmullRomCurve3(pts); mesh.geometry.dispose();
+  mesh.geometry = new THREE.TubeGeometry(curve, Math.max(4, pts.length), r, 8, false); }
+function thickArrow(color, r){ const mat = new THREE.MeshBasicMaterial({ color });
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 1, 12), mat);
+  const head  = new THREE.Mesh(new THREE.ConeGeometry(r*2.4, r*6, 16), mat);
+  const g = new THREE.Group(); g.add(shaft, head);
+  g.set = (origin, dir, len) => { const hl = r*6, sl = Math.max(0.0001, len - hl);
+    shaft.scale.y = sl; shaft.position.set(0, sl/2, 0); head.position.set(0, sl + hl/2, 0);
+    g.position.copy(origin); g.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.clone().normalize()); };
+  g.setColor = c => mat.color.set(c); return g; }
+const tauArrow = thickArrow(0x6b46c1, TH); sMain.add(tauArrow);
+const tip = new THREE.Mesh(new THREE.SphereGeometry(0.06,16,16), new THREE.MeshBasicMaterial({color:0x6b46c1})); sMain.add(tip);
+const geoTube = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({color:0xdd6b20})); sMain.add(geoTube);
+const unrollTube = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({color:0x6b46c1})); unrollTube.visible=false; sMain.add(unrollTube);
+const xM = new THREE.Mesh(new THREE.SphereGeometry(0.07,20,20), new THREE.MeshBasicMaterial({color:0xc99a00})); sMain.add(xM);
+const dot = new THREE.Mesh(new THREE.SphereGeometry(0.06,16,16), new THREE.MeshBasicMaterial({color:0x111111})); dot.visible=false; sMain.add(dot);
+
+// labels (KaTeX)
+const tagE = mathTag(ovl3, '\\varepsilon', '#2f855a'),
+      tagT = mathTag(ovl3, '\\tau^{\\wedge} = \\log(X)', '#6b46c1'),
+      tagX = mathTag(ovl3, 'X = \\exp(\\tau^{\\wedge})', '#b7791f');
+
+function expAt(t){ const n=t.length(); if(n<1e-9) return E.clone();
+  return E.clone().multiplyScalar(Math.cos(n)).add(t.clone().multiplyScalar(Math.sin(n)/n)); }
+function logMap(P){ const d=Math.acos(THREE.MathUtils.clamp(P.dot(E),-1,1));
+  const pr=P.clone().addScaledVector(E,-P.dot(E)); if(pr.length()<1e-9) return new THREE.Vector3(); return pr.normalize().multiplyScalar(d); }
+let tau = new THREE.Vector3(0,1.3,0.9);
+let tauN = 0, tauDir = new THREE.Vector3(0,1,0);
+function updateSO3(){
+  tauN = tau.length(); tauDir = tauN<1e-9? new THREE.Vector3(0,1,0):tau.clone().normalize();
+  const bp = E.clone().multiplyScalar(Rr);
+  tauArrow.set(bp, tauDir, Math.max(0.001, tauN)*Rr);
+  tip.position.copy(bp).addScaledVector(tauDir, tauN*Rr);
+  const pts=[]; for(let i=0;i<=40;i++) pts.push(expAt(tau.clone().multiplyScalar(i/40)).multiplyScalar(Rr));
+  setTube(geoTube, pts, TH);
+  const X = expAt(tau); xM.position.copy(X).multiplyScalar(Rr);
+}
+// wrap/unwrap animation: unroll the geodesic (in its great-circle plane) onto the tangent line τ.
+// a = how much is still wrapped on the sphere (0 = fully unrolled to τ, tauN = fully on manifold at X)
+function drawSO3Anim(a){
+  const pts=[]; for(let i=0;i<=40;i++){ const phi=a*i/40;
+    pts.push(E.clone().multiplyScalar(Math.cos(phi)).addScaledVector(tauDir, Math.sin(phi)).multiplyScalar(Rr)); }
+  setTube(geoTube, pts, TH);                                     // wrapped geodesic arc [0..a]
+  const Pa = E.clone().multiplyScalar(Math.cos(a)).addScaledVector(tauDir, Math.sin(a));  // peel point (unit)
+  const Ta = E.clone().multiplyScalar(-Math.sin(a)).addScaledVector(tauDir, Math.cos(a)); // unit tangent there
+  const p0 = Pa.multiplyScalar(Rr);
+  const p1 = p0.clone().addScaledVector(Ta, (tauN - a)*Rr);     // straight unrolled part
+  setTube(unrollTube, [p0, p1], TH);
+  dot.visible = true; dot.position.copy(p1);
+}
+// orbit + drag
+let oth=-0.5, oph=1.05, orad=7, odrag=false, opx, opy, m3=null;   // camera rotated 90° about vertical
+function camU(){ const s=Math.sin(oph); camMain.position.set(orad*s*Math.sin(oth),orad*Math.cos(oph),orad*s*Math.cos(oth)); camMain.lookAt(0,0,0); }
+const ray=new THREE.Raycaster();
+function ndc(e){ const r=rMain.domElement.getBoundingClientRect(); return new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1); }
+const tPlane=new THREE.Plane().setFromNormalAndCoplanarPoint(E,E.clone().multiplyScalar(Rr));
+rMain.domElement.addEventListener('pointerdown', e=>{ if(anim){ m3='orbit'; opx=e.clientX; opy=e.clientY; return; }
+  ray.setFromCamera(ndc(e),camMain);
+  if(ray.intersectObject(tip).length){ m3='exp'; return; }
+  if(ray.intersectObject(sphere).length){ m3='log'; doLog(e); return; }
+  m3='orbit'; opx=e.clientX; opy=e.clientY; });
+window.addEventListener('pointermove', e=>{ if(!m3) return; ray.setFromCamera(ndc(e),camMain);
+  if(m3==='orbit'){ oth-=(e.clientX-opx)*0.008; oph=Math.min(3.0,Math.max(0.15,oph-(e.clientY-opy)*0.008)); opx=e.clientX; opy=e.clientY; camU(); }
+  else if(m3==='exp'){ const hp=new THREE.Vector3(); if(ray.ray.intersectPlane(tPlane,hp)){
+    let v=hp.sub(E.clone().multiplyScalar(Rr)).multiplyScalar(1/Rr); v.addScaledVector(E,-v.dot(E));
+    if(v.length()>Math.PI) v.setLength(Math.PI); tau.copy(v); updateSO3(); } }
+  else if(m3==='log'){ doLog(e); } });
+window.addEventListener('pointerup', ()=>m3=null);
+rMain.domElement.addEventListener('wheel', e=>{ e.preventDefault(); orad=Math.min(9,Math.max(3,orad*(1+Math.sign(e.deltaY)*0.08))); camU(); }, {passive:false});
+function doLog(e){ ray.setFromCamera(ndc(e),camMain); const h=ray.intersectObject(sphere); if(h.length){ tau.copy(logMap(h[0].point.clone().normalize())); updateSO3(); } }
+
+// project label
+function placeTag(tag, world){ const v=world.clone().project(camMain); const r=host3.getBoundingClientRect();
+  if(v.z>1){ tag.style.display='none'; return; } tag.style.display='block';
+  tag.style.left=((v.x*0.5+0.5)*r.width)+'px'; tag.style.top=((-v.y*0.5+0.5)*r.height - 12)+'px'; }
+
+function sizeSO3(){ const r=host3.getBoundingClientRect(); rMain.setSize(r.width,r.height); camMain.aspect=r.width/r.height; camMain.updateProjectionMatrix(); }
+
+// ===== main loop =====
+let so3Reset = false;
+function loop(){
+  requestAnimationFrame(loop);
+  if (anim){ const raw=Math.min(1,(performance.now()-anim.t0)/1400);
+    animP = raw<0.5 ? 2*raw*raw : 1-Math.pow(-2*raw+2,2)/2;
+    if (raw>=1){ anim=null; syncButtons(); so3Reset=true; } }
+  drawSO2(); placeSO2Labels();
+  // SO(3): wrap / unwrap the geodesic (mirror of SO(2))
+  if (anim){ const a = anim.mode==='log' ? tauN*(1-animP) : tauN*animP; drawSO3Anim(a);
+    tauArrow.setColor(new THREE.Color(anim.mode==='exp' ? 0xd7c6f0 : 0x6b46c1)); }
+  else if (so3Reset){ so3Reset=false; unrollTube.visible=false; dot.visible=false;
+    tauArrow.setColor(0x6b46c1); updateSO3(); }
+  rMain.render(sMain,camMain);
+  // labels
+  placeTag(tagE, E.clone().multiplyScalar(Rr));
+  placeTag(tagT, E.clone().multiplyScalar(Rr).addScaledVector(tauDir, tauN*Rr));
+  placeTag(tagX, expAt(tau).multiplyScalar(Rr));
+}
+function resizeAll(){ drawSO2(); sizeSO3(); }
+window.addEventListener('resize', resizeAll);
+camU(); resizeAll(); updateSO3(); syncButtons(); loop();
+</script>
+</body>
+</html>
