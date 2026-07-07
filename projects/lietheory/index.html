@@ -79,7 +79,7 @@
     </div>
 
     <!-- ===== SECTION 1 ===== -->
-    <h2 id="s1">Functions and optimisation</h2>
+    <h2 id="s1">Functions and Optimisation</h2>
     <p>A function takes an <strong>input</strong>, does something, and returns an
       <strong>output</strong>. <br>We often need to <b>optimise</b>: find the <em>best</em> input that minimises some constraint (a cost function).
     </p>
@@ -129,7 +129,7 @@
     <h2 id="s3">Manifolds: the shape of "all valid inputs"</h2>
     <p>Not every matrix is a rotation. In 2D, only <b>orthogonal</b> matrices with <b>determinant 1</b> are rotations.
       Together they form the <b>SO(2)</b> Lie group. Because every such matrix is determined by a single angle, <i>θ</i>,
-      we can represent the SO(2) manifold (spce) as a circle in 2D, with each point on the circle representing an element of the group.</p>
+      we can represent the SO(2) manifold (space) as a circle in 2D, with each point on the circle representing an element of the group.</p>
     <p>Similarly, <b>SO(3)</b> is the set of all 3×3 orthogonal matrices with determinant 1. These 3D rotations form a three-dimensional curved manifold. 
       This can't be drawn directly, so we'll use a sphere to represent it.</p>
     <p>SO(2) and SO(3) are <b>Lie groups</b>: they are both manifolds and groups; elements of the group can be composed (combined) together,
@@ -146,15 +146,17 @@
     <!-- ===== SECTION 4 ===== -->
     <h2 id="s4">Tangent Space, Exp and Log maps</h2>
     <p>When working with Lie groups, we want the best of both worlds: ensure the input is always <strong>on the manifold</strong> (always a valid
-      rotation), but do any maths in a easy-to-work with flat (Euclidean-like) space, known as the <strong>tangent space</strong>.
+      rotation), but do any maths in an easy-to-work-with flat (Euclidean-like) space, known as the <strong>tangent space</strong>.
       <b>Every point on the manifold</b> has a tangent space at that point. (If the manifold is a ball, imagine the tangent plane at a point on the ball.)</p>
       <div class="key">Technically the tangent space contains infinitesimal increments that update elements of a Lie group. e.g. for SO(2), a tangent-space element is a small angle dθ.</div>
       
     <h3>The tangent space at the <strong>identity element ε</strong> is called the <b>Lie Algebra</b>.</h3>
     <p>Two mappings (functions) connect a Lie group (manifold) to its Lie algebra (tangent space at the identity element ε), and they are inverses of each other:</p>
     <ul>
-      <li>The <strong>logarithmic map</strong> converts a Lie group element → Lie algebra element <br> <span class="math math-inline">\tau^{\wedge} = \log(X)</span>.</li>
-      <li>The <strong>exponential map</strong> converts a Lie algebra element → Lie group element <br> <span class="math math-inline">X = \exp(\tau^{\wedge})</span>.</li>
+      <li>The <strong>logarithmic map</strong> converts a Lie group element <span class="math math-inline">X</span> → Lie algebra element <span class="math math-inline">\tau^{\wedge}</span>:<br>
+        <span class="math math-inline">\tau^{\wedge} = \log(X)</span>.</li>
+      <li>The <strong>exponential map</strong> converts a Lie algebra element <span class="math math-inline">\tau^{\wedge}</span> → Lie group element <span class="math math-inline">X</span>:<br>
+        <span class="math math-inline">X = \exp(\tau^{\wedge})</span>.</li>
     </ul>
     <blockquote>Don't worry about the superscript <span class="math math-inline">\wedge</span> for now, we'll explain it in the next section.</blockquote>
     <p>In this demo, press <strong>log</strong> to lift a point into the Lie algebra (tangent space at the identity ε), and <strong>exp</strong> to retract (wrap) it back onto the Lie group (manifold).
@@ -177,10 +179,10 @@
       even though there are only 3 degrees of freedom here.</p>
     <p>Luckily, the tangent space of a Lie group with <span class="math math-inline">n</span> degrees of freedom is <strong>isomorphic</strong> to
       <span class="math math-inline">\mathbb{R}^n</span> — a nice one-to-one mapping with a Euclidean space (<span class="math math-inline">\mathbb{R}^1</span> for SO(2), <span class="math math-inline">\mathbb{R}^3</span> for SO(3)).
-      Let's call this the <strong>Cartesian Workspace</strong>. Working here is <em>equivalent</em> to working in the tangent space, just a lot easier so we can think of it as a proxy to the tangent space.</p>
+      <br>Let's call this the <strong>Cartesian Workspace</strong>. Working here is <em>equivalent</em> to working in the tangent space, just a lot easier so we can think of it as a proxy to the tangent space.</p>
     <p>Since we will always work with Cartesian Workspace vectors, we just need to introduce two operators:
       <ul>
-        <li><strong>hat</strong> <span class="math math-inline">(\cdot)^\wedge</span>: lifts a vector in <span class="math math-inline">\mathbb{R}^n</span> up to its Lie algebra.</li>
+        <li><strong>hat</strong> <span class="math math-inline">(\cdot)^\wedge</span>: lifts a vector in <span class="math math-inline">\mathbb{R}^n</span> in the Cartesian Workspace up to the Lie algebra.</li>
         <li><strong>vee</strong> <span class="math math-inline">(\cdot)^\vee</span>: brings a Lie algebra element back down to a vector in <span class="math math-inline">\mathbb{R}^n</span> in the Cartesian Workspace.
         This is the inverse of the hat operator.</li>
       </ul>
@@ -190,7 +192,7 @@
       <iframe class="demo" style="height:290px" src="demos/07_collapse_to_coordinates.html" loading="lazy" title="Figure 5"></iframe>
       <figcaption><b>Figure 5. The isomorphism between the Lie algebra and the Cartesian Workspace.</b> <br>
         Edit the Cartesian Workspace vectors on the right to see how the Lie algebra elements change. The <b>hat</b>
-        <span class="math math-inline">(\cdot)^\wedge</span> operator lifts vectors up onto the Lie algebra, and the <b>vee</b> <span class="math math-inline">(\cdot)^\vee</span> operatorbrings
+        <span class="math math-inline">(\cdot)^\wedge</span> operator lifts vectors up onto the Lie algebra, and the <b>vee</b> <span class="math math-inline">(\cdot)^\vee</span> operator brings
         Lie algebra elements back down to the Cartesian Workspace.</figcaption>
     </figure>
 
@@ -218,7 +220,7 @@
 
     <!-- ===== SECTION 7 ===== -->
     <h2 id="s7">Summary</h2>
-    <p>Robotics and Engineering often involves dealing with mathematical objects in curved spaces known as Lie groups.
+    <p>Robotics and Engineering often involve dealing with mathematical objects in curved spaces known as Lie groups.
       Optimisation on these spaces is tricky because the objects are constrained and can't be perturbed freely.
     </p>
     <p>The whole idea is to journey across three spaces. We want to optimise on the <strong>Lie group</strong>
