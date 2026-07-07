@@ -101,7 +101,7 @@
         <div class="tnote">Can do maths here<br> easy to work with</div>
       </div>
     </div>
-    <p class="diagram-cap">By the end of this article you'll understand this diagram: working with Lie groups is really about these three spaces — and how to move between them.</p>
+    <p class="diagram-cap">By the end of this article you'll understand this diagram: working with Lie groups is really about these three spaces and how to move between them.</p>
 
     <!-- ===== SECTION 1 ===== -->
     <h2 id="s1">Functions and Optimisation</h2>
@@ -115,9 +115,10 @@
       <li><b>Step</b>: update your input by taking a small step against the gradient direction.</li>
     </ol>
     <h3>This is easy if your function operates on Euclidean space (vectors).</h3>
-    <p>Let's say the input is a vector, (a 2D point)
-      <span class="math math-inline">(x_1, x_2)</span>.<br> If you perturb <span class="math math-inline">x_1</span> by a tiny <span class="math math-inline">\delta</span>:
-      you get <span class="math math-inline">(x_1 + \delta,\, x_2)</span>, still a perfectly valid 2D point which you can feed into your function.</p>
+    <p>Let's say the input is a 2D vector <span class="math math-inline">(x_1, x_2)</span>.
+      <br>Perturbing <span class="math math-inline">x_1</span> by a tiny <span class="math math-inline">\delta</span> 
+      leaves you with <span class="math math-inline">(x_1 + \delta,\, x_2)</span>.
+      <br>This perturbed vector is still a perfectly valid 2D point that you can feed into your function.</p>
 
     <figure class="fig">
       <iframe class="demo" style="height:540px" src="demos/01_functions_and_optimisation.html" loading="lazy" title="Figure 1"></iframe>
