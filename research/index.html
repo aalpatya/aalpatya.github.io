@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Research · Aalok Patwardhan</title>
+  <meta name="description" content="Publications and research by Aalok Patwardhan — multi-robot systems, Gaussian Belief Propagation, and computer vision.">
+  <link rel="icon" type="image/png" href="/assets/img/prof_pic.png">
+  <link rel="stylesheet" href="/css/site.css">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <!-- SEO -->
+  <link rel="canonical" href="https://aalok.uk/research/">
+  <meta name="author" content="Aalok Patwardhan">
+  <meta name="keywords" content="Aalok Patwardhan, computer vision, robotics, Gaussian Belief Propagation, GBP, multi-robot systems, SLAM, machine learning, research">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Aalok Patwardhan">
+  <meta property="og:title" content="Research · Aalok Patwardhan">
+  <meta property="og:description" content="Publications and research by Aalok Patwardhan — multi-robot systems, Gaussian Belief Propagation, and computer vision.">
+  <meta property="og:url" content="https://aalok.uk/research/">
+  <meta property="og:image" content="https://aalok.uk/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Research · Aalok Patwardhan">
+  <meta name="twitter:description" content="Publications and research by Aalok Patwardhan — multi-robot systems, Gaussian Belief Propagation, and computer vision.">
+  <meta name="twitter:image" content="https://aalok.uk/assets/img/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Research · Aalok Patwardhan", "description": "Publications and research by Aalok Patwardhan — multi-robot systems, Gaussian Belief Propagation, and computer vision.", "url": "https://aalok.uk/research/"}</script>
+</head>
+<body>
+
+  <main class="wrap-mid">
+    <h1>Research</h1>
+    <div class="section-lead">
+      <p>My research broadly spans two areas:</p>
+      <ul>
+        <li>Distributed multi-robot coordination using Gaussian Belief Propagation (GBP).</li>
+        <li>Monocular Visual Odometry using RGB data for Simultaneous Localisation and Mapping (SLAM).</li>
+      </ul>
+      <p>Click <em>Abstract</em> on any card to read more.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card card-paper">
+        <a class="card-cover" href="/research/dancers/" aria-label="DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms"></a>
+        <div class="card-img"><video autoplay muted loop playsinline poster="/assets/img/card_dancers.jpg"><source src="/assets/img/card_dancers.mp4" type="video/mp4"></video></div>
+        <div class="card-body">
+          <h3 class="card-title">DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms</h3>
+          <p class="paper-authors"><span class="me">Aalok Patwardhan</span>, Andrew J. Davison</p>
+          <p class="paper-desc">Robots can communicate locally, but the whole swarm agrees globally.</p>
+          <details class="abstract"><summary>Abstract</summary><p>Robot swarms require cohesive collective behaviour to address diverse challenges, including shape formation and decision-making. Existing approaches often treat consensus in discrete and continuous decision spaces as distinct problems. We present DANCeRS, a unified, distributed algorithm leveraging Gaussian Belief Propagation (GBP) to achieve consensus in both domains. By representing a swarm as a factor graph our method ensures scalability and robustness in dynamic environments, relying on purely peer-to-peer message passing. We demonstrate the effectiveness of our general framework through two applications where agents in a swarm must achieve consensus on global behaviour whilst relying on local communication. In the first, robots must perform path planning and collision avoidance to create shape formations. In the second, we show how the same framework can be used by a group of robots to form a consensus over a set of discrete decisions. Experimental results highlight our method&#x27;s scalability and efficiency compared to recent approaches to these problems making it a promising solution for multi-robot systems requiring distributed consensus. We encourage the reader to see the supplementary video demo.</p></details>
+        </div>
+      </div>
+      <div class="card card-paper">
+        <a class="card-cover" href="https://spiral.imperial.ac.uk/entities/publication/d7f69b3b-29a9-4d28-962a-2f7474454359" target="_blank" rel="noopener" aria-label="PhD Thesis: Distributed Coordination and Perception for Multi-Robot Systems"></a>
+        <div class="card-img"><img src="/assets/img/card_thesis.png" alt=""></div>
+        <div class="card-body">
+          <h3 class="card-title">PhD Thesis: Distributed Coordination and Perception for Multi-Robot Systems</h3>
+          <p class="paper-authors"><span class="me">Aalok Patwardhan</span></p>
+          <p class="paper-desc">My PhD Thesis, which includes real-robot GBP and all of my research.</p>
+          <details class="abstract"><summary>Abstract</summary><p>This thesis explores a scalable, fully distributed framework for multi-robot collaboration under uncertainty in real-world environments. Multi-robot systems offer significant advantages over single-robot solutions, including parallelised task execution, redundancy, and scalability, enabling applications such as autonomous exploration and environmental monitoring. Achieving these benefits requires coordination, yet centralised approaches face bottlenecks, single points of failure, and limited adaptability. Real-world tasks are further complicated by noisy sensors, partial observations, and unreliable communication. Distributed frameworks overcome these challenges by enabling robots to reason locally and communicate with neighbours, supporting scalable and adaptive collective behaviour. We formulate multi-robot coordination as probabilistic inference on factor graphs, using Gaussian Belief Propagation to perform local, asynchronous message-passing over nodes representing robot states and constraints. Our framework addresses complex multi-robot problems spanning multiple competencies such as path planning, exploration, and shape formation tasks. Robots coordinate to optimise locally, while emergent global behaviour arises from sparse but structured interactions. The framework also supports distributed consensus over continuous and discrete decision spaces, allowing swarms to agree on shared global states. Practical applicability is demonstrated via deployment on low-cost embedded hardware, achieving fully decentralised coordination through peer-to-peer communication. Finally, the thesis also demonstrates the applications of factor graphs to computer vision tasks, developing an uncertainty-aware rotation estimator that produces temporally consistent camera rotation estimates from RGB images. This thesis demonstrates that factor-graph-based methods provide a lightweight and generalisable backbone for multi-robot systems, by unifying planning, exploration, formation, and consensus under a distributed, probabilistic approach. We envisage that these methods unlock the potential for large, heterogeneous swarms of the future to perform complex, coordinated behaviours in dynamic and uncertain environments.</p></details>
+        </div>
+      </div>
+      <div class="card card-paper">
+        <a class="card-cover" href="/research/uareme/" aria-label="U-ARE-ME: Uncertainty-Aware Rotation Estimation in Manhattan Environments"></a>
+        <div class="card-img"><video autoplay muted loop playsinline poster="/assets/img/card_uareme.jpg"><source src="/assets/img/card_uareme.mp4" type="video/mp4"></video></div>
+        <div class="card-body">
+          <h3 class="card-title">U-ARE-ME: Uncertainty-Aware Rotation Estimation in Manhattan Environments</h3>
+          <p class="paper-authors"><span class="me">Aalok Patwardhan</span>, Callum Rhodes, Gwangbin Bae, Andrew J. Davison</p>
+          <p class="paper-desc">Can we estimate camera rotation with uncertainty over an RGB sequence for in-the-wild data?</p>
+          <details class="abstract"><summary>Abstract</summary><p>Camera rotation estimation from a single image is a challenging task, often requiring depth data and/or camera intrinsics, which are generally not available for in-the-wild videos. Although external sensors such as inertial measurement units (IMUs) can help, they often suffer from drift and are not applicable in non-inertial reference frames. We present U-ARE-ME, an algorithm that estimates camera rotation along with uncertainty from uncalibrated RGB images. Using a Manhattan World assumption, our method leverages the per-pixel geometric priors encoded in single-image surface normal predictions and performs optimisation over the SO(3) manifold. Given a sequence of images, we can use the per-frame rotation estimates and their uncertainty to perform multi-frame optimisation, achieving robustness and temporal consistency. Our experiments demonstrate that U-ARE-ME performs comparably to RGB-D methods and is more robust than sparse feature-based SLAM methods. We encourage the reader to view the accompanying video at this https URL for a visual overview of our method.</p></details>
+        </div>
+      </div>
+      <div class="card card-paper">
+        <a class="card-cover" href="/research/gbpstack/" aria-label="A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus"></a>
+        <div class="card-img"><video autoplay muted loop playsinline poster="/assets/img/card_gbpstack.jpg"><source src="/assets/img/card_gbpstack.mp4" type="video/mp4"></video></div>
+        <div class="card-body">
+          <h3 class="card-title">A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus</h3>
+          <p class="paper-authors"><span class="me">Aalok Patwardhan</span>, Andrew J. Davison</p>
+          <p class="paper-desc">Can robots help each other explore and collect noisy information about a global state?</p>
+          <details class="abstract"><summary>Abstract</summary><p>The distributed coordination of robot teams performing complex tasks is challenging to formulate. The different aspects of a complete task such as local planning for obstacle avoidance, global goal coordination and collaborative mapping are often solved separately, when clearly each of these should influence the others for the most efficient behaviour. In this paper we use the example application of distributed information acquisition as a robot team explores a large space to show that we can formulate the whole problem as a single factor graph with multiple connected layers representing each aspect. We use Gaussian Belief Propagation (GBP) as the inference mechanism, which permits parallel, on-demand or asynchronous computation for efficiency when different aspects are more or less important. This is the first time that a distributed GBP multi-robot solver has been proven to enable intelligent collaborative behaviour rather than just guiding robots to individual, selfish goals.</p></details>
+        </div>
+      </div>
+      <div class="card card-paper">
+        <a class="card-cover" href="/research/gbpplanner/" aria-label="Distributing Collaborative Multi-Robot Planning with Gaussian Belief Propagation"></a>
+        <div class="card-img"><video autoplay muted loop playsinline poster="/assets/img/card_gbpplanner.jpg"><source src="/assets/img/card_gbpplanner.mp4" type="video/mp4"></video></div>
+        <div class="card-body">
+          <h3 class="card-title">Distributing Collaborative Multi-Robot Planning with Gaussian Belief Propagation</h3>
+          <p class="paper-authors"><span class="me">Aalok Patwardhan</span>, Riku Murai, Andrew J. Davison</p>
+          <p class="paper-desc">How can many robots plan paths around obstacles and each other, avoiding collisions?</p>
+          <details class="abstract"><summary>Abstract</summary><p>Precise coordinated planning over a forward time window enables safe and highly efficient motion when many robots must work together in tight spaces, but this would normally require centralised control of all devices which is difficult to scale. We demonstrate GBP Planning, a new purely distributed technique based on Gaussian Belief Propagation for multi-robot planning problems, formulated by a generic factor graph defining dynamics and collision constraints over a forward time window. In simulations, we show that our method allows high performance collaborative planning where robots are able to cross each other in busy, intricate scenarios. They maintain shorter, quicker and smoother trajectories than alternative distributed planning techniques even in cases of communication failure. We encourage the reader to view the accompanying video demonstration.</p></details>
+        </div>
+      </div>
+      <div class="card card-paper">
+        <div class="card-img"><video autoplay muted loop playsinline poster="/assets/img/card_formations.jpg"><source src="/assets/img/card_formations.mp4" type="video/mp4"></video></div>
+        <div class="card-body">
+          <h3 class="card-title">Distributed Formation Planning for Robot Swarms</h3>
+          <p class="paper-authors"><span class="me">Aalok Patwardhan</span></p>
+          <p class="paper-desc">Shape formations in a swarm, formulated as inference on a factor graph.</p>
+          <details class="abstract"><summary>Abstract</summary><p>A swarm of robots is often required to create formations in space whilst avoiding obstacles in the environment. In order to do so a high degree of coordination is required between the robots to ensure smooth and safe paths. We formulate formation planning as performing inference on a factor graph using Gaussian Belief Propagation (GBP). This work is an outline of the real time and interactive demos we would like to show at the Distributed Graphs Workshop at ICRA 2023. We show some examples of the demos that will be displayed, and hope that this work encourages more research in this field.</p></details>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/site.js" defer></script>
+</body>
+</html>

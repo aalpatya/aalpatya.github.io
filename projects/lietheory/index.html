@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lie Theory: A Visual Introduction</title>
+  <meta name="description" content="An interactive, visual introduction to Lie groups and optimisation on curved spaces — for the curious robotics enthusiast.">
+  <link rel="icon" type="image/png" href="/assets/img/prof_pic.png">
+
+  <!-- shared chrome + theme (no-flicker) -->
+  <link rel="stylesheet" href="/css/site.css">
+  <link rel="stylesheet" href="/css/article.css">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- KaTeX for the maths (the only external dependency, and it is optional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <!-- SEO -->
+  <link rel="canonical" href="https://aalok.uk/projects/lietheory/">
+  <meta name="author" content="Aalok Patwardhan">
+  <meta name="keywords" content="Aalok Patwardhan, computer vision, robotics, Gaussian Belief Propagation, GBP, multi-robot systems, SLAM, machine learning, research">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aalok Patwardhan">
+  <meta property="og:title" content="Lie Theory: A Visual Introduction">
+  <meta property="og:description" content="An interactive, visual introduction to Lie groups and optimisation on curved spaces — for the curious robotics enthusiast.">
+  <meta property="og:url" content="https://aalok.uk/projects/lietheory/">
+  <meta property="og:image" content="https://aalok.uk/assets/img/card_lietheory.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Lie Theory: A Visual Introduction">
+  <meta name="twitter:description" content="An interactive, visual introduction to Lie groups and optimisation on curved spaces — for the curious robotics enthusiast.">
+  <meta name="twitter:image" content="https://aalok.uk/assets/img/card_lietheory.jpg">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Lie Theory: A Visual Introduction", "author": {"@type": "Person", "name": "Aalok Patwardhan", "url": "https://www.aalok.uk"}, "datePublished": "2025", "url": "https://aalok.uk/projects/lietheory/", "image": "https://aalok.uk/assets/img/card_lietheory.jpg", "description": "An interactive, visual introduction to Lie groups and optimisation on curved spaces — for the curious robotics enthusiast."}</script>
+</head>
+<body>
+
+  <div class="doc">
+    <aside class="toc-col">
+      <button class="toc-toggle" aria-expanded="false">Contents <span class="chev">▾</span></button>
+      <nav class="toc">
+        <h3>Contents</h3>
+        <div><a href="#s0">Lie Theory in a Nutshell</a></div>
+        <div><a href="#s1">Functions and Optimisation</a></div>
+        <div><a href="#s2">Optimising over a Rotation</a></div>
+        <div><a href="#s3">Manifolds</a></div>
+        <div><a href="#s4">Tangent Space, Exp and Log Maps</a></div>
+        <div><a href="#s5">The Cartesian Workspace as a Proxy Tangent Space</a></div>
+        <div><a href="#s6">The Importance of Lie Groups</a></div>
+        <div><a href="#s7">Summary</a></div>
+      </nav>
+    </aside>
+    <main class="body-col">
+      <header class="doc-header">
+        <h1>Lie Theory: A Visual Introduction without the Maths</h1>
+    <p>A starting point to understanding Lie theory and optimisation on curved spaces with intuitive demos.</p>
+    <p class="byline-custom">By <a href="https://www.aalok.uk" target="_blank" rel="noopener">Aalok Patwardhan</a></p>
+      </header>
+    <!-- ===== SECTION 0 ===== -->
+    <div class="key"><b>Important Note:</b> This is a visual introduction to Lie groups without any mathematical formalism. 
+      The reader is <em>highly encouraged</em> to read <a href="https://arxiv.org/abs/1812.01537"><em>A micro Lie theory for state estimation in robotics
+</em></a> for an excellent and very intuitive understanding.</div>
+      <h2 id="s0">Lie Theory in a Nutshell</h2>
+    <div class="intro-split l-middle">
+        <p>A <strong>Lie group</strong> is a smooth curved space containing "things" representing transformations, for example, rotations or poses.
+        <br><br>We can't do optimisation and maths directly on the curved space, so we temporarily work in a flat
+          "tangent space", then convert the result back to the curved space.
+        <br><br>Many resources for Lie Theory immediately go deep into mathematical details. <strong>This one won't.</strong></p>
+      <figure class="intro-demo">
+        <iframe class="demo" src="demos/00_so3_intro.html" loading="lazy" title="SO(3) explorer"></iframe>
+        <figcaption>The SO(3) Lie group (the space of all 3D rotations) visualised as a sphere (blue), along with its Lie algebra (green).</figcaption>
+      </figure>
+    </div>
+
+    <!-- ===== SECTION 1 ===== -->
+    <h2 id="s1">Functions and optimisation</h2>
+    <p>A function takes an <strong>input</strong>, does something, and returns an
+      <strong>output</strong>. <br>We often need to <b>optimise</b>: find the <em>best</em> input that minimises some constraint (a cost function).
+    </p>
+    <p>Let's say we have a starting guess for the best input (which is often random). Other than randomly trying different inputs, <strong>how do we actually find the optimal input?</strong></p>
+    <ol>
+      <li><b>Perturb</b>: Nudge the input in each of its dimensions and plug in to the cost function.</li>
+      <li><b>Gradient</b>: calculate the gradient.</li>
+      <li><b>Step</b>: update your input by taking a small step against the gradient direction.</li>
+    </ol>
+    <h3>This is easy if your function operates on Euclidean space (vectors).</h3>
+    <p>Let's say the input is a vector, (a 2D point)
+      <span class="math math-inline">(x_1, x_2)</span>.<br> If you perturb <span class="math math-inline">x_1</span> by a tiny <span class="math math-inline">\delta</span>:
+      you get <span class="math math-inline">(x_1 + \delta,\, x_2)</span>, still a perfectly valid 2D point which you can feed into your function.</p>
+
+    <figure class="fig">
+      <iframe class="demo" style="height:540px" src="demos/01_functions_and_optimisation.html" loading="lazy" title="Figure 1"></iframe>
+      <figcaption><b>Figure 1. Optimisation in Euclidean space.</b><br> Drag the input <b>x</b> on the grid to see the cost function output change. 
+        On the right, the cost function is shown as a surface: height is f(x). Click through the optimisation steps to see how the optimal input is found.
+      </figcaption>
+    </figure>
+
+    <!-- ===== SECTION 2 ===== -->
+    <h2 id="s2">Optimising over a rotation</h2>
+    <p>That was easy because the input was a plain vector. What if the input is a rotation? Take the
+      simplest case — 2D rotations, like a robot's heading or a steering angle.</p>
+    <p>A 2D rotation is usually written as a matrix:</p>
+    <div class="math math-block">R(\theta)=\begin{bmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos\theta\end{bmatrix}</div>
+    <p>It has four numbers, but they're not independent: the columns must be unit-length and
+      perpendicular, and the determinant must be <span class="math math-inline">+1</span>. There is only <em>one</em> real degree of
+      freedom: the angle <span class="math math-inline">\theta</span>.</p>
+    <p>Now try to perturb <strong>each element</strong> by <span class="math math-inline">\delta</span> to estimate a
+      gradient. The result has columns that are no longer orthonormal and a determinant that is no longer
+      1. <strong>It is not a rotation anymore</strong>, just a 2×2 grid of numbers, which we
+      can't feed back into our cost function.</p>
+
+    <figure class="fig">
+      <iframe class="demo" style="height:380px" src="demos/02_illegal_nudge.html" loading="lazy" title="Figure 2"></iframe>
+      <figcaption><b>Figure 2. Invalid perturbations on a rotation matrix</b><br> Perturb any matrix element of a rotation matrix by dragging it to add some <span class="math math-inline">\delta</span>,
+        and it stops being a rotation. Watch as the two basis vectors stop being perpendicular and unit length — the determinant is no longer
+        1.</figcaption>
+    </figure>
+
+    <div class="key"><b>Key line:</b> you cannot "perturb one number" of a rotation and stay a rotation.
+      The naive gradient step is illegal.</div>
+
+    <!-- ===== SECTION 3 ===== -->
+    <h2 id="s3">Manifolds: the shape of "all valid inputs"</h2>
+    <p>Not every matrix is a rotation. In 2D, only <b>orthogonal</b> matrices with <b>determinant 1</b> are rotations.
+      Together they form the <b>SO(2)</b> Lie group. Because every such matrix is determined by a single angle, <i>θ</i>,
+      we can represent the SO(2) manifold (spce) as a circle in 2D, with each point on the circle representing an element of the group.</p>
+    <p>Similarly, <b>SO(3)</b> is the set of all 3×3 orthogonal matrices with determinant 1. These 3D rotations form a three-dimensional curved manifold. 
+      This can't be drawn directly, so we'll use a sphere to represent it.</p>
+    <p>SO(2) and SO(3) are <b>Lie groups</b>: they are both manifolds and groups; elements of the group can be composed (combined) together,
+      inverted, interpolated smoothly, and include an identity element (a "do-nothing" operation).</p>
+
+
+    <figure class="fig">
+      <iframe class="demo" style="height:440px" src="demos/03_manifold_so2.html" loading="lazy" title="Figure 3"></iframe>
+      <figcaption><b>Figure 3. Points on a Manifold</b><br> Two manifolds side by side: the SO(2) circle and the SO(3) sphere.
+        Drag the point on either one — each point is a group element, and the cutaway shows the
+        coordinate frame it represents. The group Identity is shown at ε.</figcaption>
+    </figure>
+
+    <!-- ===== SECTION 4 ===== -->
+    <h2 id="s4">Tangent Space, Exp and Log maps</h2>
+    <p>When working with Lie groups, we want the best of both worlds: ensure the input is always <strong>on the manifold</strong> (always a valid
+      rotation), but do any maths in a easy-to-work with flat (Euclidean-like) space, known as the <strong>tangent space</strong>.
+      <b>Every point on the manifold</b> has a tangent space at that point. (If the manifold is a ball, imagine the tangent plane at a point on the ball.)</p>
+      <div class="key">Technically the tangent space contains infinitesimal increments that update elements of a Lie group. e.g. for SO(2), a tangent-space element is a small angle dθ.</div>
+      
+    <h3>The tangent space at the <strong>identity element ε</strong> is called the <b>Lie Algebra</b>.</h3>
+    <p>Two mappings (functions) connect a Lie group (manifold) to its Lie algebra (tangent space at the identity element ε), and they are inverses of each other:</p>
+    <ul>
+      <li>The <strong>logarithmic map</strong> converts a Lie group element → Lie algebra element <br> <span class="math math-inline">\tau^{\wedge} = \log(X)</span>.</li>
+      <li>The <strong>exponential map</strong> converts a Lie algebra element → Lie group element <br> <span class="math math-inline">X = \exp(\tau^{\wedge})</span>.</li>
+    </ul>
+    <blockquote>Don't worry about the superscript <span class="math math-inline">\wedge</span> for now, we'll explain it in the next section.</blockquote>
+    <p>In this demo, press <strong>log</strong> to lift a point into the Lie algebra (tangent space at the identity ε), and <strong>exp</strong> to retract (wrap) it back onto the Lie group (manifold).
+    </p>
+
+    <figure class="fig">
+      <iframe class="demo" style="height:480px" src="demos/06_exp_log.html" loading="lazy" title="Figure 4"></iframe>
+      <figcaption><b>Figure 4. The log and exp maps.</b><br> Click the <b>log</b> and <b>exp</b> map buttons to see the relationship between 
+        points on the manifold and points in the tangent space.</figcaption>
+    </figure>
+
+    <!-- ===== SECTION 5 ===== -->
+    <h2 id="s5">The Cartesian Workspace as a Proxy Tangent Space</h2>
+    <p>What we'd really like is to do the tangent-space maths in a nice <strong>Euclidean space</strong>
+      <span class="math math-inline">\mathbb{R}^n</span> — where everything is a vector that you can add, subtract, and differentiate
+      freely.</p>
+    <p>But a tangent space isn't necessarily that. Its elements can be strange objects: an element of SO(2)'s tangent space is 
+      actually an imaginary number <span class="math math-inline">i\theta</span>, despite the single degree of freedom <span class="math math-inline">\theta</span>.
+      A member of SO(3)'s tangent space is actually a <em>3×3 skew-symmetric matrix</em>,
+      even though there are only 3 degrees of freedom here.</p>
+    <p>Luckily, the tangent space of a Lie group with <span class="math math-inline">n</span> degrees of freedom is <strong>isomorphic</strong> to
+      <span class="math math-inline">\mathbb{R}^n</span> — a nice one-to-one mapping with a Euclidean space (<span class="math math-inline">\mathbb{R}^1</span> for SO(2), <span class="math math-inline">\mathbb{R}^3</span> for SO(3)).
+      Let's call this the <strong>Cartesian Workspace</strong>. Working here is <em>equivalent</em> to working in the tangent space, just a lot easier so we can think of it as a proxy to the tangent space.</p>
+    <p>Since we will always work with Cartesian Workspace vectors, we just need to introduce two operators:
+      <ul>
+        <li><strong>hat</strong> <span class="math math-inline">(\cdot)^\wedge</span>: lifts a vector in <span class="math math-inline">\mathbb{R}^n</span> up to its Lie algebra.</li>
+        <li><strong>vee</strong> <span class="math math-inline">(\cdot)^\vee</span>: brings a Lie algebra element back down to a vector in <span class="math math-inline">\mathbb{R}^n</span> in the Cartesian Workspace.
+        This is the inverse of the hat operator.</li>
+      </ul>
+    </p>
+
+    <figure class="fig">
+      <iframe class="demo" style="height:290px" src="demos/07_collapse_to_coordinates.html" loading="lazy" title="Figure 5"></iframe>
+      <figcaption><b>Figure 5. The isomorphism between the Lie algebra and the Cartesian Workspace.</b> <br>
+        Edit the Cartesian Workspace vectors on the right to see how the Lie algebra elements change. The <b>hat</b>
+        <span class="math math-inline">(\cdot)^\wedge</span> operator lifts vectors up onto the Lie algebra, and the <b>vee</b> <span class="math math-inline">(\cdot)^\vee</span> operatorbrings
+        Lie algebra elements back down to the Cartesian Workspace.</figcaption>
+    </figure>
+
+    <div class="key"><b>Key line:</b> the tangent space is isomorphic to plain
+      <span class="math math-inline">\mathbb{R}^n</span>, so you get minimal, constraint-free coordinates to optimise in.</div>
+
+    <!-- ===== SECTION 6 ===== -->
+    <h2 id="s6">The Importance of Lie Groups</h2>
+    <p>Lie groups, tangent spaces, and the log and exp maps underpin a huge amount of robotics optimisation: 
+      <ul>
+        <li><strong>Pose optimisation, bundle adjustment and SLAM</strong>: solve in the tangent space, retract each step onto the manifold so poses stay valid.</li>
+        <li><strong>IMU / motion integration</strong>: compose small rotations smoothly via the exp map.</li>
+        <li><strong>State estimation</strong>: EKF/UKF on manifolds represent state and uncertainty in the tangent space.</li>
+      </ul>
+    <p>When dealing with uncertainty over Lie groups, a Gaussian distribution is defined in the
+      tangent space around a mean Lie group element.</p>
+
+    <figure class="fig">
+      <iframe class="demo" style="height:470px" src="demos/08_uncertainty_banana.html" loading="lazy" title="Figure 6"></iframe>
+      <figcaption><b>Figure 6.</b> Points are randomly sampled from an isotropic Gaussian distribution in the flat tangent space at the Lie group identity.
+        Each sample is visualised on the manifold, where the round shape of the Gaussian blob becomes warped.
+        Drag the mean far from the base and increase <span class="math math-inline">\sigma</span> to exaggerate it — this is why flat-space statistics on
+        rotations fail.</figcaption>
+    </figure>
+
+    <!-- ===== SECTION 7 ===== -->
+    <h2 id="s7">Summary</h2>
+    <p>Robotics and Engineering often involves dealing with mathematical objects in curved spaces known as Lie groups.
+      Optimisation on these spaces is tricky because the objects are constrained and can't be perturbed freely.
+    </p>
+    <p>The whole idea is to journey across three spaces. We want to optimise on the <strong>Lie group</strong>
+      (the curved space of valid transformations) but can't do maths there directly. <br>
+      So we hop via the <strong>log</strong> map to its <strong>Lie algebra</strong>, and
+      then, via the <strong>vee</strong> operator, to the plain <strong>Cartesian Workspace</strong>
+       <span class="math math-inline">\mathbb{R}^n</span>, where ordinary vector maths just works.
+      Do the maths there, then travel back to the Lie group using the <strong>hat</strong> operator and <strong>exp</strong> map.</p>
+
+    <div class="triptych l-body">
+      <div class="tbox g1">
+        <div class="tname">Lie Group</div>
+        <div class="tnote">Want to do maths here<br>Can't do maths here</div>
+      </div>
+      <div class="tconn">
+        <div class="cgrp"><span class="math math-inline">\log</span><span class="ar">⟶</span></div>
+        <div class="cgrp"><span class="math math-inline">\exp</span><span class="ar">⟵</span></div>
+      </div>
+      <div class="tbox g2">
+        <div class="tname">Tangent Space / Lie Algebra</div>
+        <div class="tnote">Can do maths here<br> but it's unwieldy</div>
+      </div>
+      <div class="tconn">
+        <div class="cgrp"><span class="math math-inline">(\cdot)^\vee</span><span class="ar">⟶</span></div>
+        <div class="cgrp"><span class="math math-inline">(\cdot)^\wedge</span><span class="ar">⟵</span></div>
+      </div>
+      <div class="tbox g3">
+        <div class="tname">Cartesian Workspace</div>
+        <div class="tnote">Can do maths here<br> easy to work with</div>
+      </div>
+    </div>
+    <div class="key"><b>Next Steps:</b> 
+      <br>Make sure to read <a href="https://arxiv.org/abs/1812.01537"><em>A micro Lie theory for state estimation in robotics</em></a> which was an inspiration for this work.
+      <br><br>For an application of Lie theory in robotics, see <a href="https://aalok.uk/dancers"><em>DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms</em></a>.</div>
+
+  
+      <section class="appendix">
+        <h3>Further reading</h3>
+    <p>Solà, Deray &amp; Atchuthan, “A micro Lie theory for state estimation in robotics” (2018) —
+      the friendly reference this explainer follows.</p>
+      </section>
+    </main>
+  </div>
+
+  <!-- maths rendering + scroll-spy -->
+  <script defer src="/js/article.js"></script>
+  <!-- shared nav bar + theme toggle -->
+  <script src="/js/site.js" defer></script>
+</body>
+</html>

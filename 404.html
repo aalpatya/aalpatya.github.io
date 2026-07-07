@@ -1,9 +1,40 @@
----
-layout: page
-permalink: /404.html
-title: "Page not found"
-description: "Looks like there has been a mistake. Nothing exists here."
-redirect: true
----
-
-<p>You will be redirected to the main page within 3 seconds. If not redirected, please go back to the <a href="{{ site.baseurl }}/">home page</a>.</p>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page not found · Aalok Patwardhan</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="/assets/img/prof_pic.png">
+  <link rel="stylesheet" href="/css/site.css">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    .nf { text-align: center; padding: 60px 0; }
+    .nf .code { font-size: 5rem; font-weight: 800; color: var(--accent); line-height: 1; margin: 0; }
+    .nf h1 { margin: 12px 0 6px; }
+    .nf p { color: var(--muted); }
+    .nf .home { display: inline-block; margin-top: 18px; padding: 10px 18px; border-radius: 999px;
+      background: var(--accent); color: #fff; font-weight: 600; }
+    .nf .home:hover { opacity: .9; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="nf">
+      <p class="code">404</p>
+      <h1>Page not found</h1>
+      <p>That page doesn't exist or may have moved.</p>
+      <a class="home" href="/">Back to home</a>
+    </div>
+  </main>
+  <script src="/js/site.js" defer></script>
+</body>
+</html>

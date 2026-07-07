@@ -2,22 +2,15 @@ window.funProjects = [
   {
     title: "Assassin",
     slug: "assassin",
-    url: "../assassin/index.html",
+    url: "assassin/index.html",
     mark: "🥷",
     description: "Secret targets, odd objects, suspicious places."
   },
   {
     title: "Chameleon",
     slug: "chameleon",
-    url: "../chameleon/index.html",
+    url: "chameleon/index.html",
     mark: "🦎",
     description: "One secret word, one hidden bluff."
-  },
-  {
-    title: "DANCeRS Demo",
-    slug: "dancers",
-    url: "./dancers/index.html",
-    image: "./dancers/dancers.gif",
-    description: "Distributed robot swarms negotiating consensus, in your browser."
   }
 ];

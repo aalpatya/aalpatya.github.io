@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projects · Aalok Patwardhan</title>
+  <meta name="description" content="Interactive explainers, guides, and creative projects by Aalok Patwardhan.">
+  <link rel="icon" type="image/png" href="/assets/img/prof_pic.png">
+  <link rel="stylesheet" href="/css/site.css">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <!-- SEO -->
+  <link rel="canonical" href="https://aalok.uk/projects/">
+  <meta name="author" content="Aalok Patwardhan">
+  <meta name="keywords" content="Aalok Patwardhan, computer vision, robotics, Gaussian Belief Propagation, GBP, multi-robot systems, SLAM, machine learning, research">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Aalok Patwardhan">
+  <meta property="og:title" content="Projects · Aalok Patwardhan">
+  <meta property="og:description" content="Interactive explainers, guides, and creative projects by Aalok Patwardhan.">
+  <meta property="og:url" content="https://aalok.uk/projects/">
+  <meta property="og:image" content="https://aalok.uk/assets/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Projects · Aalok Patwardhan">
+  <meta name="twitter:description" content="Interactive explainers, guides, and creative projects by Aalok Patwardhan.">
+  <meta name="twitter:image" content="https://aalok.uk/assets/img/og-image.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Projects · Aalok Patwardhan", "description": "Interactive explainers, guides, and creative projects by Aalok Patwardhan.", "url": "https://aalok.uk/projects/"}</script>
+</head>
+<body>
+
+  <main class="wrap-mid">
+    <h1>Projects</h1>
+    <p class="section-lead">Interactive explainers, visual guides, and things I build for fun.</p>
+
+    <div class="cards">
+
+      <a class="card" href="/projects/lietheory/">
+        <div class="card-img"><video autoplay muted loop playsinline poster="/assets/img/card_lietheory.jpg" aria-label="Lie Theory"><source src="/assets/img/card_lietheory.mp4" type="video/mp4"></video></div>
+        <div class="card-body">
+          <h3>Lie Theory: A Visual Introduction without the Maths</h3>
+          <p>An interactive tour of Lie groups and optimisation on curved spaces — for the curious robotics enthusiast.</p>
+        </div>
+      </a>
+
+      <a class="card" href="https://towardsdatascience.com/train-an-object-detector-using-tensorflow-2-object-detection-api-in-2021-a4fed450d1b9" target="_blank" rel="noopener">
+        <div class="card-img"><video autoplay muted loop playsinline poster="/assets/img/card_theremin.jpg" aria-label="CV Theremin"><source src="/assets/img/card_theremin.mp4" type="video/mp4"></video></div>
+        <div class="card-body">
+          <h3>Computer Vision Theremin</h3>
+          <p>Use your hands to play a musical instrument.</p>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <script src="/js/site.js" defer></script>
+</body>
+</html>

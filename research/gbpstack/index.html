@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus</title>
+  <meta name="description" content="Can robots help each other explore and collect noisy information about a global state?">
+  <link rel="icon" type="image/png" href="/assets/img/prof_pic.png">
+  <link rel="stylesheet" href="/css/site.css">
+  <link rel="stylesheet" href="/css/article.css">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("theme");
+        if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+  <!-- SEO -->
+  <link rel="canonical" href="https://aalok.uk/research/gbpstack/">
+  <meta name="author" content="Aalok Patwardhan">
+  <meta name="keywords" content="Aalok Patwardhan, computer vision, robotics, Gaussian Belief Propagation, GBP, multi-robot systems, SLAM, machine learning, research">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aalok Patwardhan">
+  <meta property="og:title" content="A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus">
+  <meta property="og:description" content="Can robots help each other explore and collect noisy information about a global state?">
+  <meta property="og:url" content="https://aalok.uk/research/gbpstack/">
+  <meta property="og:image" content="https://aalok.uk/research/gbpstack/img/gbpstack.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus">
+  <meta name="twitter:description" content="Can robots help each other explore and collect noisy information about a global state?">
+  <meta name="twitter:image" content="https://aalok.uk/research/gbpstack/img/gbpstack.jpg">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "ScholarlyArticle", "headline": "A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus", "name": "A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus", "author": [{"@type": "Person", "name": "Aalok Patwardhan"}, {"@type": "Person", "name": "Andrew J. Davison"}], "datePublished": "2024", "url": "https://aalok.uk/research/gbpstack/", "image": "https://aalok.uk/research/gbpstack/img/gbpstack.jpg", "description": "Can robots help each other explore and collect noisy information about a global state?", "publisher": {"@type": "Person", "name": "Aalok Patwardhan"}}</script>
+</head>
+<body>
+
+  <div class="doc">
+    <aside class="toc-col">
+      <button class="toc-toggle" aria-expanded="false">Contents <span class="chev">&#9662;</span></button>
+      <nav class="toc">
+        <h3>Contents</h3>
+        <div><a href="#overview">Overview</a></div>
+        <div><a href="#video">Video</a></div>
+        <div><a href="#cite">Cite</a></div>
+      </nav>
+    </aside>
+    <main class="body-col">
+      <header class="doc-header">
+        <h1>A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus</h1>
+        <p class="proj-venue">IEEE International Conference on Robotics and Automation (ICRA) · 2024</p>
+        <p class="proj-authors"><span class="me">Aalok Patwardhan</span>, Andrew J. Davison</p>
+        <p class="proj-affil">Imperial College London · Dyson Robotics Lab</p>
+        <div class="btn-row"><a class="btn ghost" href="https://ieeexplore.ieee.org/document/10610185" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> Paper</a><a class="btn ghost" href="https://www.youtube.com/watch?v=47SzujUq9dg" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Video</a></div>
+      </header>
+
+      <div class="proj-figure"><video autoplay muted loop playsinline poster="img/gbpstack.jpg" aria-label="Robots exploring and sharing information"><source src="img/gbpstack.mp4" type="video/mp4"></video></div>
+      <h2 id="overview">Overview</h2>
+      <p>The distributed coordination of robot teams performing complex tasks is challenging to formulate. The different aspects of a complete task such as local planning for obstacle avoidance, global goal coordination and collaborative mapping are often solved separately, when clearly each of these should influence the others for the most efficient behaviour. In this paper we use the example application of distributed information acquisition as a robot team explores a large space to show that we can formulate the whole problem as a single factor graph with multiple connected layers representing each aspect. We use Gaussian Belief Propagation (GBP) as the inference mechanism, which permits parallel, on-demand or asynchronous computation for efficiency when different aspects are more or less important. This is the first time that a distributed GBP multi-robot solver has been proven to enable intelligent collaborative behaviour rather than just guiding robots to individual, selfish goals.</p>
+
+      <h2 id="video">Video Demonstration</h2>
+      <div class="video-embed">
+        <iframe src="https://www.youtube.com/embed/47SzujUq9dg" title="Video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+      </div>
+
+      <h2 id="cite">Cite</h2>
+      <pre class="bibtex">@inproceedings{patwardhan2024distributed,
+  title     = {A Distributed Multi-Robot Framework for Exploration, Information Acquisition and Consensus},
+  author    = {Patwardhan, Aalok and Davison, Andrew J.},
+  booktitle = {IEEE International Conference on Robotics and Automation (ICRA)},
+  year      = {2024}
+}</pre>
+    </main>
+  </div>
+
+  <script defer src="/js/article.js"></script>
+  <script src="/js/site.js" defer></script>
+  <!-- Default Statcounter code for GBPStack
+  https://aalok.uk/gbpstack -->
+  <script type="text/javascript">
+  var sc_project=12892523; 
+  var sc_invisible=1; 
+  var sc_security="1a01eea7"; 
+  </script>
+  <script type="text/javascript"
+  src="https://www.statcounter.com/counter/counter.js"
+  async></script>
+  <noscript><div class="statcounter"><a title="Web Analytics"
+  href="https://statcounter.com/" target="_blank"><img
+  class="statcounter"
+  src="https://c.statcounter.com/12892523/0/1a01eea7/1/"
+  alt="Web Analytics"
+  referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
+  <!-- End of Statcounter Code -->
+</body>
+</html>

@@ -5,18 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Fun</title>
     <meta name="robots" content="noindex">
+    <!-- shared banner + footer; this page follows the site light/dark theme -->
+    <link rel="stylesheet" href="/css/site.css">
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("theme");
+          if (!t) t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          document.documentElement.setAttribute("data-theme", t);
+        } catch (e) {}
+      })();
+    </script>
     <style>
+      /* Playground palette mapped onto the site theme variables (see css/site.css),
+         so the whole page flips with light/dark. --muted comes from site.css. */
       :root {
-        color-scheme: dark;
-        --ink: #f7f2e8;
-        --muted: #b8c0ba;
-        --panel: rgba(20, 24, 27, 0.74);
-        --panel-strong: rgba(28, 34, 38, 0.92);
-        --edge: rgba(247, 242, 232, 0.18);
-        --gold: #e1bb74;
-        --green: #55b987;
+        --ink: var(--text);
+        --panel: var(--card-bg);
+        --panel-strong: var(--bg-soft);
+        --edge: var(--border);
+        --shadow: rgba(0, 0, 0, 0.16);
+        --gold: #c79a3a;   /* playful brand accents, tuned to read on both themes */
+        --green: #3f9d6d;
         --red: #d95f62;
-        --shadow: rgba(0, 0, 0, 0.34);
       }
 
       * {
@@ -29,9 +40,9 @@
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         color: var(--ink);
         background:
-          radial-gradient(circle at 18% 12%, rgba(85, 185, 135, 0.22), transparent 28rem),
-          radial-gradient(circle at 82% 0%, rgba(217, 95, 98, 0.16), transparent 25rem),
-          linear-gradient(135deg, #111619 0%, #171411 46%, #101316 100%);
+          radial-gradient(circle at 18% 12%, rgba(63, 157, 109, 0.16), transparent 28rem),
+          radial-gradient(circle at 82% 0%, rgba(217, 95, 98, 0.12), transparent 25rem),
+          var(--bg);
       }
 
       main {
@@ -105,6 +116,7 @@
           linear-gradient(145deg, rgba(225, 187, 116, 0.2), transparent 48%),
           var(--panel-strong);
         outline: none;
+        text-decoration: none;
       }
 
       .tile-top {
@@ -132,7 +144,7 @@
         object-fit: cover;
         border-radius: 6px;
         border: 1px solid var(--edge);
-        background: #000;
+        background: var(--bg-soft);
       }
 
       .tile h2 {
@@ -169,7 +181,7 @@
 
       <section class="tiles" aria-label="Fun projects" id="project-tiles">
         <noscript>
-          <a class="tile" href="../assassin/index.html">
+          <a class="tile" href="assassin/index.html">
             <span class="tile-top" aria-hidden="true">
               <span class="mark">🥷</span>
             </span>
@@ -223,5 +235,8 @@
         return tile;
       }));
     </script>
+
+    <!-- shared site banner + footer -->
+    <script src="/js/site.js" defer></script>
   </body>
 </html>
