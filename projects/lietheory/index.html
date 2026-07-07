@@ -68,7 +68,9 @@
 </em></a> for an excellent and very intuitive understanding.</div>
       <h2 id="s0">Lie Theory in a Nutshell</h2>
     <div class="intro-split l-middle">
-        <p>A <strong>Lie group</strong> is a smooth curved space containing "things" representing transformations, for example, rotations or poses.
+        <p>A <strong>Lie group</strong> is a smooth 
+          <span class="term" data-def="A space that bends back on itself, so you can't move in straight lines or add coordinates freely and stay on it — like the surface of a globe.">curved space</span> 
+          containing "things" representing <span class="term" data-def="Transformations could be things like rotations, rotations+translations that can affect vectors">transformations</span>, for example, rotations or poses.
         <br><br>We can't do optimisation and maths directly on the curved space, so we temporarily work in a flat
           "tangent space", then convert the result back to the curved space.
         <br><br>Many resources for Lie Theory immediately go deep into mathematical details. <strong>This one won't.</strong></p>
@@ -132,7 +134,7 @@
       we can represent the SO(2) manifold (space) as a circle in 2D, with each point on the circle representing an element of the group.</p>
     <p>Similarly, <b>SO(3)</b> is the set of all 3×3 orthogonal matrices with determinant 1. These 3D rotations form a three-dimensional curved manifold. 
       This can't be drawn directly, so we'll use a sphere to represent it.</p>
-    <p>SO(2) and SO(3) are <b>Lie groups</b>: they are both manifolds and groups; elements of the group can be composed (combined) together,
+    <p>SO(2) and SO(3) are <b>Lie groups</b>: they are both manifolds and groups; elements of the group can be <span class="term" data-def="To combine two elements of a group to get another element of the group, just like multipying two rotation matrices gives another rotation matrix.">composed</span> (combined) together,
       inverted, interpolated smoothly, and include an identity element (a "do-nothing" operation).</p>
 
 
@@ -252,15 +254,12 @@
         <div class="tnote">Can do maths here<br> easy to work with</div>
       </div>
     </div>
-    <div class="key"><b>Next Steps:</b> 
-      <br>Make sure to read <a href="https://arxiv.org/abs/1812.01537"><em>A micro Lie theory for state estimation in robotics</em></a> which was an inspiration for this work.
-      <br><br>For an application of Lie theory in robotics, see <a href="https://aalok.uk/dancers"><em>DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms</em></a>.</div>
-
-  
-      <section class="appendix">
-        <h3>Further reading</h3>
-    <p>Solà, Deray &amp; Atchuthan, “A micro Lie theory for state estimation in robotics” (2018) —
-      the friendly reference this explainer follows.</p>
+    
+    
+    <section class="appendix">
+        <div class="key"><b>Next Steps:</b> 
+          <br>Make sure to read <a href="https://arxiv.org/abs/1812.01537"><em>A micro Lie theory for state estimation in robotics</em></a> which was an inspiration for this work.
+          <br><br>For an application of Lie theory in robotics, see <a href="https://aalok.uk/dancers"><em>DANCeRS: A Distributed Algorithm for Negotiating Consensus in Robot Swarms</em></a>.</div>
       </section>
     </main>
   </div>

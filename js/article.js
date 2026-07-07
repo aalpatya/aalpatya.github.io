@@ -61,7 +61,43 @@
     });
   }
 
-  function init() { renderMath(); scrollSpy(); mobileToc(); }
+  // Hover / tap definitions: <span class="term" data-def="…">word</span>
+  function glossary() {
+    var terms = document.querySelectorAll(".term[data-def]");
+    if (!terms.length) return;
+    var tip = document.createElement("div");
+    tip.className = "term-tip";
+    tip.setAttribute("role", "tooltip");
+    document.body.appendChild(tip);
+    var current = null;
+
+    function place(el) {
+      var r = el.getBoundingClientRect();
+      var t = tip.getBoundingClientRect();
+      var top = r.top - t.height - 8;
+      if (top < 4) top = r.bottom + 8;                 // flip below if no room above
+      var left = r.left + r.width / 2 - t.width / 2;
+      var max = document.documentElement.clientWidth - t.width - 8;
+      left = Math.max(8, Math.min(left, max));         // keep on-screen
+      tip.style.top = (top + window.scrollY) + "px";
+      tip.style.left = (left + window.scrollX) + "px";
+    }
+    function show(el) { current = el; tip.textContent = el.getAttribute("data-def"); tip.classList.add("show"); place(el); }
+    function hide() { current = null; tip.classList.remove("show"); }
+
+    terms.forEach(function (el) {
+      el.setAttribute("tabindex", "0");
+      el.addEventListener("mouseenter", function () { show(el); });
+      el.addEventListener("mouseleave", hide);
+      el.addEventListener("focus", function () { show(el); });
+      el.addEventListener("blur", hide);
+      el.addEventListener("click", function (e) { e.preventDefault(); current === el ? hide() : show(el); });
+    });
+    window.addEventListener("scroll", function () { if (current) place(current); }, { passive: true });
+    document.addEventListener("click", function (e) { if (current && !e.target.closest(".term")) hide(); });
+  }
+
+  function init() { renderMath(); scrollSpy(); mobileToc(); glossary(); }
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

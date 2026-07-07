@@ -5,6 +5,19 @@
    fixed nav banner. Everything is theme-aware via the site.css variables.
    ========================================================================== */
 
+/* ---- hover/tap glossary terms (see js/article.js) ---- */
+.term { border-bottom: 1px dotted var(--accent); cursor: help; }
+.term:hover, .term:focus { color: var(--accent); outline: none; }
+.term-tip {
+  position: absolute; z-index: 200; max-width: 280px;
+  background: var(--card-bg); color: var(--text);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 11px; font-size: .88rem; line-height: 1.45;
+  box-shadow: var(--shadow);
+  opacity: 0; visibility: hidden; transition: opacity .12s ease; pointer-events: none;
+}
+.term-tip.show { opacity: 1; visibility: visible; }
+
 /* ---- document grid: [ contents | text ] ---- */
 .doc { max-width: 1040px; margin: 0 auto; padding: 40px 22px 0; }
 
