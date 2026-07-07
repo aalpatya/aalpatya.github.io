@@ -5,6 +5,10 @@
    fixed nav banner. Everything is theme-aware via the site.css variables.
    ========================================================================== */
 
+/* caption under an inline diagram (e.g. the Nutshell triptych) */
+.diagram-cap { text-align: center; color: var(--muted); font-size: .95rem;
+  max-width: 640px; margin: 4px auto 1.4em; line-height: 1.5; }
+
 /* ---- hover/tap glossary terms (see js/article.js) ---- */
 .term { border-bottom: 1px dotted var(--accent); cursor: help; }
 .term:hover, .term:focus { color: var(--accent); outline: none; }

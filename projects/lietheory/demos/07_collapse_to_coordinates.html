@@ -87,7 +87,8 @@
   function render() {
     if (!window.katex) return;
     const th = num(thEl.value);
-    katex.render(`${th.toFixed(2)}\\,i`, tan2, { displayMode: true, throwOnError: false });
+    const m2 = `\\begin{bmatrix} 0 & ${(-th).toFixed(2)} \\\\ ${th.toFixed(2)} & 0 \\end{bmatrix}`;
+    katex.render(m2, tan2, { displayMode: true, throwOnError: false });
     const wx = num(wxEl.value), wy = num(wyEl.value), wz = num(wzEl.value);
     const m = `\\begin{bmatrix}` +
       ` 0 & ${(-wz).toFixed(2)} & ${wy.toFixed(2)} \\\\` +
