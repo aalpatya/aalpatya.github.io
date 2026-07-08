@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>8 · Uncertainty Banana</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: #fff; color: #2a2a2a;
@@ -15,17 +17,22 @@
   input[type=range] { width: 130px; accent-color: #6b46c1; }
   #view { flex: 1; position: relative; }
   #view canvas { display: block; width: 100%; height: 100%; }
-  .k { position:absolute; left:12px; bottom:10px; font-size:12px; color:#6b7280; }
+  .k { position:absolute; left:12px; bottom:10px; font-size:12px; color:#6b7280; max-width: 92%; }
+  .lbl { position:absolute; transform:translate(-50%,-50%); pointer-events:none; white-space:nowrap;
+    font-size:15px; z-index:5; text-shadow:0 0 3px #fff,0 1px 2px #fff,0 0 6px #fff; }
+  .lbl .katex { font-size:1.05em; }
 </style>
 </head>
 <body>
 <div id="app">
   <header><h1>8 · Uncertainty on a Lie Group</h1>
-    <label>spread σ</label><input id="sig" type="range" min="0" max="1.3" step="0.01" value="0.2">
-    <span>drag the mean around · a round Gaussian in the flat tangent space bends into a “banana” on the manifold</span>
+    <label>spread σ</label><input id="sig" type="range" min="0" max="0.7" step="0.01" value="0.5">
+    <span>drag the mean <b>X</b> around · a round Gaussian in the tangent space <em>at X</em> warps on the manifold</span>
   </header>
   <div id="view">
-    <div class="k"><b style="color:#38a169">green plane</b> = tangent space (flat, symmetric blob) &nbsp;·&nbsp; <b style="color:#6b46c1">violet dots</b> = the same samples via exp</div>
+    <div class="k"><b style="color:#38a169">green plane</b> = tangent space at X &nbsp;·&nbsp;
+      the <b style="color:#9f7aea">violet blob</b> in the plane warps into the <b style="color:#f59e0b">orange blob</b> on the manifold via exp &nbsp;·&nbsp;
+      the circle bounds it at 3σ</div>
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -37,94 +44,179 @@ const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(45,1,0.1,100);
 scene.add(new THREE.AmbientLight(0xffffff,0.9));
 const dl=new THREE.DirectionalLight(0xffffff,0.5); dl.position.set(3,5,4); scene.add(dl);
-let th=-0.5, ph=1.05, rad=7, mode=null, px, py;
-function cam(){ const s=Math.sin(ph); camera.position.set(rad*s*Math.sin(th),rad*Math.cos(ph),rad*s*Math.cos(th)); camera.lookAt(0,0,0); }
+let th=0.0, ph=1.1, rad=4.6, mode=null, px, py;
+function cam(){ const s=Math.sin(ph); camera.position.set(rad*s*Math.sin(th),rad*Math.cos(ph),rad*s*Math.cos(th)); camera.lookAt(0,1,0); }
 
-const Rr=1.4, E=new THREE.Vector3(1,0,0);
-const sphereGeo=new THREE.SphereGeometry(Rr,48,48);
+const Rr=1.4;
+const CAP=Math.PI/3;   // show a cap from the top (pole) down to 45° polar = 45° above the equator
+// spherical cap at the top, pole (the reference/"identity") pointing +Y
+const sphereGeo=new THREE.SphereGeometry(Rr,48,24,0,Math.PI*2,0,CAP);
 const sphere=new THREE.Mesh(sphereGeo,
-  new THREE.MeshStandardMaterial({color:0x7fb3e0,transparent:true,opacity:0.4,metalness:0.1,roughness:0.6}));
+  new THREE.MeshStandardMaterial({color:0x7fb3e0,transparent:true,opacity:0.35,metalness:0.1,roughness:0.6,side:THREE.DoubleSide}));
 sphere.add(new THREE.LineSegments(new THREE.WireframeGeometry(sphereGeo), new THREE.LineBasicMaterial({color:0xcccccc})));
 scene.add(sphere);
-const planeQ=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1),E);
-const plane=new THREE.Mesh(new THREE.PlaneGeometry(4.0, 4.0),
-  new THREE.MeshBasicMaterial({color:0x68d391,transparent:true,opacity:0.3,side:THREE.DoubleSide,depthWrite:false}));
-plane.position.copy(E).multiplyScalar(Rr); plane.quaternion.copy(planeQ); scene.add(plane);
+
+// tangent plane — repositioned to sit tangent AT X every frame
+const plane=new THREE.Mesh(new THREE.PlaneGeometry(2.5,2.5),
+  new THREE.MeshBasicMaterial({color:0x68d391,transparent:true,opacity:0.28,side:THREE.DoubleSide,depthWrite:false}));
+scene.add(plane);
 function planeGrid(size, div, color){
   const pts=[], h=size/2, step=size/div;
   for(let i=0;i<=div;i++){ const t=-h+i*step; pts.push(t,-h,0.003, t,h,0.003, -h,t,0.003, h,t,0.003); }
   const g=new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(pts,3));
   return new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color, transparent:true, opacity:0.5 }));
 }
-plane.add(planeGrid(4.0, 16, 0x66b98c));
-const epsM=new THREE.Mesh(new THREE.SphereGeometry(0.05,16,16),new THREE.MeshBasicMaterial({color:0x2f855a}));
-epsM.position.copy(E).multiplyScalar(Rr); scene.add(epsM);
-const xM=new THREE.Mesh(new THREE.SphereGeometry(0.065,20,20),new THREE.MeshBasicMaterial({color:0xc99a00})); scene.add(xM);
-// ---- line/vector thickness (tweak TH) ----
-const TH = 0.028;
-function setTube(mesh, pts, r){ if (pts.length < 2){ mesh.visible=false; return; } mesh.visible=true;
-  const curve = new THREE.CatmullRomCurve3(pts); mesh.geometry.dispose();
-  mesh.geometry = new THREE.TubeGeometry(curve, Math.max(4, pts.length), r, 8, false); }
-function thickArrow(color, r){ const mat = new THREE.MeshBasicMaterial({ color });
-  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 1, 12), mat);
-  const head  = new THREE.Mesh(new THREE.ConeGeometry(r*2.4, r*6, 16), mat);
-  const g = new THREE.Group(); g.add(shaft, head);
-  g.set = (origin, dir, len) => { const hl = r*6, sl = Math.max(0.0001, len - hl);
-    shaft.scale.y = sl; shaft.position.set(0, sl/2, 0); head.position.set(0, sl + hl/2, 0);
-    g.position.copy(origin); g.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.clone().normalize()); };
-  g.setColor = c => mat.color.set(c); return g; }
-const geoTube=new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({color:0xc99a00})); scene.add(geoTube);
-// tangent vector τ from ε to the mean's tangent point
-const tauArrow=thickArrow(0x6b46c1, TH); scene.add(tauArrow);
-const tipM=new THREE.Mesh(new THREE.SphereGeometry(0.05,16,16), new THREE.MeshBasicMaterial({color:0x6b46c1})); scene.add(tipM);
+plane.add(planeGrid(2.5, 12, 0x66b98c));
 
-function expAt(t){ const n=t.length(); if(n<1e-9) return E.clone();
-  return E.clone().multiplyScalar(Math.cos(n)).add(t.clone().multiplyScalar(Math.sin(n)/n)); }
-function logMap(P){ const d=Math.acos(THREE.MathUtils.clamp(P.dot(E),-1,1));
-  const pr=P.clone().addScaledVector(E,-P.dot(E)); if(pr.length()<1e-9) return new THREE.Vector3(); return pr.normalize().multiplyScalar(d); }
+// mean marker X
+const xM=new THREE.Mesh(new THREE.SphereGeometry(0.05,20,20),new THREE.MeshBasicMaterial({color:0xc99a00})); scene.add(xM);
 
-// fixed standard-normal draws
-function randn(){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
-const NS=1000, G=Array.from({length:NS},()=>({a:randn(),b:randn()}));
-const ptMat=c=>new THREE.PointsMaterial({color:c,size:0.05,sizeAttenuation:true,transparent:true,opacity:0.95});
-const ptsTan=new THREE.Points(new THREE.BufferGeometry(),ptMat(0x9f7aea)); ptsTan.renderOrder=2; scene.add(ptsTan);
-const ptsMan=new THREE.Points(new THREE.BufferGeometry(),ptMat(0x6b46c1)); ptsMan.renderOrder=2; scene.add(ptsMan);
+// ---- LaTeX labels, projected from 3D each frame ----
+const lblX=document.createElement('div'); lblX.className='lbl'; lblX.style.color='#b8860b'; host.appendChild(lblX);
+const lblN=document.createElement('div'); lblN.className='lbl'; lblN.style.color='#6b46c1'; host.appendChild(lblN);
+if(window.katex){ katex.render('X', lblX, {throwOnError:false});
+  katex.render('\\mathcal{N}(X,\\Sigma)', lblN, {throwOnError:false}); }
+// a thin SVG leader line pointing from the 𝒩 label to the blob
+const svgNS='http://www.w3.org/2000/svg';
+const ovl=document.createElementNS(svgNS,'svg');
+ovl.setAttribute('style','position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:4;overflow:visible');
+const leadN=document.createElementNS(svgNS,'line');
+leadN.setAttribute('stroke','#6b46c1'); leadN.setAttribute('stroke-width','0.7'); leadN.setAttribute('stroke-linecap','round');
+ovl.appendChild(leadN); host.appendChild(ovl);
 
-let X=new THREE.Vector3(0,0.7,0.5).normalize();
-function update(){
-  const tau=logMap(X), n=tau.length();
-  const bp=E.clone().multiplyScalar(Rr);
-  const dir=n<1e-9? new THREE.Vector3(0,1,0):tau.clone().normalize();
-  const tip=bp.clone().addScaledVector(dir,n*Rr);
-  tauArrow.set(bp, dir, Math.max(0.001, n*Rr));
-  tipM.position.copy(tip);
-  // geodesic
-  const N = 40;
-  const pts=[]; for(let i=0;i<=N;i++) pts.push(expAt(tau.clone().multiplyScalar(i/N)).multiplyScalar(Rr));
-  setTube(geoTube, pts, TH);
-  xM.position.copy(X).multiplyScalar(Rr);
-  // tangent basis at E
-  const u=new THREE.Vector3(0,1,0), v=new THREE.Vector3(0,0,1);
-  const k=+document.getElementById('sig').value, S=0.42;
-  const tanP=[], manP=[];
-  for(const g of G){ const d=u.clone().multiplyScalar(k*S*g.a).addScaledVector(v,k*S*g.b);
-    const t=tip.clone().addScaledVector(d,Rr); tanP.push(t.x,t.y,t.z);
-    const m=expAt(tau.clone().add(d)).multiplyScalar(Rr*1.01); manP.push(m.x,m.y,m.z); }
-  ptsTan.geometry.setAttribute('position',new THREE.Float32BufferAttribute(tanP,3));
-  ptsMan.geometry.setAttribute('position',new THREE.Float32BufferAttribute(manP,3));
+let gMean=new THREE.Vector3(0,Rr,0), gCtan=new THREE.Vector3(0,Rr,0),
+    gE1=new THREE.Vector3(1,0,0), gE2=new THREE.Vector3(0,0,1), gR=0, gHasBlob=false;
+const _pv=new THREE.Vector3(), _e=new THREE.Vector3();
+function toScreen(w){ _pv.copy(w).project(camera); const r=host.getBoundingClientRect();
+  return { x:(_pv.x*0.5+0.5)*r.width, y:(-_pv.y*0.5+0.5)*r.height, vis:_pv.z<1 }; }
+function placeLabels(){
+  const p=toScreen(gMean);
+  lblX.style.display=p.vis?'block':'none'; lblX.style.left=(p.x+16)+'px'; lblX.style.top=(p.y+15)+'px';
+  if(gHasBlob){
+    // walk the real 2σ edge circle in 3D, project each point, anchor to the visually-topmost one
+    let bx=0, by=1e9, vis=false;
+    for(let i=0;i<64;i++){ const a=i/64*Math.PI*2;
+      _e.copy(gCtan).addScaledVector(gE1, gR*Math.cos(a)).addScaledVector(gE2, gR*Math.sin(a));
+      const s=toScreen(_e); if(s.y<by){ by=s.y; bx=s.x; vis=s.vis; } }
+    const lx=bx, ly=by-42;
+    lblN.style.display=vis?'block':'none';
+    lblN.style.left=lx+'px'; lblN.style.top=ly+'px';
+    leadN.style.display=vis?'block':'none';
+    leadN.setAttribute('x1',lx); leadN.setAttribute('y1',ly+11);   // just below the label
+    leadN.setAttribute('x2',bx); leadN.setAttribute('y2',by);      // exactly on the blob's edge circle
+  } else { lblN.style.display='none'; leadN.style.display='none'; }
 }
+
+const NSIG=3;   // blob extends to — and is bounded by a circle at — 3σ
+// ---- shaded Gaussian blob: a radial gradient (alpha ~ exp(-r²/2)) painted on a canvas ----
+function gradTex(hex){
+  const N=128, c=document.createElement('canvas'); c.width=c.height=N; const g=c.getContext('2d');
+  const col=new THREE.Color(hex), R=Math.round(col.r*255), G=Math.round(col.g*255), B=Math.round(col.b*255);
+  const grd=g.createRadialGradient(N/2,N/2,0, N/2,N/2,N/2), peak=1.0;
+  for(let i=0;i<=12;i++){ const f=i/12; grd.addColorStop(f, `rgba(${R},${G},${B},${peak*Math.exp(-0.5*NSIG*NSIG*f*f)})`); }
+  g.fillStyle=grd; g.beginPath(); g.arc(N/2,N/2,N/2,0,Math.PI*2); g.fill();
+  const t=new THREE.CanvasTexture(c); t.needsUpdate=true; return t;
+}
+// flat round blob in the tangent plane
+const tangBlob=new THREE.Mesh(new THREE.PlaneGeometry(1,1),
+  new THREE.MeshBasicMaterial({map:gradTex(0x9f7aea), transparent:true, depthWrite:false, side:THREE.DoubleSide}));
+tangBlob.renderOrder=4; scene.add(tangBlob);   // draw the tangent blob on top of the manifold blob
+// warped blob on the manifold: a triangulated disk (out to 3σ) mapped through exp_X, textured with the same gradient
+const NR=12, NSG=56;
+function buildDisk(){
+  const pos=[], uv=[], idx=[], rf=[], cs=[], sn=[];
+  pos.push(0,0,0); uv.push(0.5,0.5); rf.push(0); cs.push(0); sn.push(0);
+  for(let r=1;r<=NR;r++){ const f=r/NR;
+    for(let s=0;s<NSG;s++){ const a=s/NSG*Math.PI*2;
+      pos.push(0,0,0); uv.push(0.5+0.5*f*Math.cos(a), 0.5+0.5*f*Math.sin(a));
+      rf.push(f); cs.push(Math.cos(a)); sn.push(Math.sin(a)); } }
+  for(let s=0;s<NSG;s++) idx.push(0, 1+s, 1+(s+1)%NSG);
+  for(let r=2;r<=NR;r++){ const b0=1+(r-2)*NSG, b1=1+(r-1)*NSG;
+    for(let s=0;s<NSG;s++){ const s2=(s+1)%NSG; idx.push(b0+s,b1+s,b1+s2); idx.push(b0+s,b1+s2,b0+s2); } }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv,2));
+  geo.setIndex(idx); return {geo, rf, cs, sn};
+}
+const disk=buildDisk();
+const manBlob=new THREE.Mesh(disk.geo,
+  new THREE.MeshBasicMaterial({map:gradTex(0xf59e0b), transparent:true, depthWrite:false, side:THREE.DoubleSide}));
+manBlob.renderOrder=1; scene.add(manBlob);
+
+// bounding circle at NSIG·σ — thin line loops, coloured to match each blob
+const RN=96;
+function ringMesh(color){ const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(RN*3),3));
+  return new THREE.LineLoop(geo, new THREE.LineBasicMaterial({color})); }
+const tangRing=ringMesh(0x7c3aed); tangRing.renderOrder=5; scene.add(tangRing);   // violet — bounds the tangent blob
+const manRing =ringMesh(0xd97706); manRing.renderOrder=2; scene.add(manRing);     // orange — bounds the manifold blob
+
+// exponential map based at X: great circle leaving X in direction d (d ⟂ X)
+function expX(X, d){ const n=d.length(); if(n<1e-9) return X.clone();
+  return X.clone().multiplyScalar(Math.cos(n)).add(d.clone().multiplyScalar(Math.sin(n)/n)); }
+// orthonormal basis of the tangent space at X
+function basisAt(X){ const up=Math.abs(X.y)<0.98? new THREE.Vector3(0,1,0):new THREE.Vector3(1,0,0);
+  const e1=new THREE.Vector3().crossVectors(up, X).normalize();
+  const e2=new THREE.Vector3().crossVectors(X, e1).normalize(); return [e1,e2]; }
+
+let X=new THREE.Vector3(0,1,0);   // mean starts at the top pole
+const S=0.42;
+function update(){
+  const [e1,e2]=basisAt(X);
+  plane.position.copy(X).multiplyScalar(Rr);
+  plane.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1), X);
+  xM.position.copy(X).multiplyScalar(Rr);
+  gMean.copy(X).multiplyScalar(Rr);
+  gCtan.copy(X).multiplyScalar(Rr).addScaledVector(X, 0.03);
+
+  const std=(+document.getElementById('sig').value)*S;
+  const show=std>1e-3;
+  tangBlob.visible=manBlob.visible=tangRing.visible=manRing.visible=show;
+  gHasBlob=show;
+  if(!show) return;
+
+  // flat blob in the tangent plane (bounded at NSIG·σ)
+  const diam=2*NSIG*std*Rr;
+  tangBlob.scale.set(diam, diam, 1);
+  tangBlob.position.copy(X).multiplyScalar(Rr).addScaledVector(X, 0.03);
+  tangBlob.quaternion.copy(plane.quaternion);
+  gE1.copy(e1); gE2.copy(e2); gR=NSIG*std*Rr;
+
+  // warped blob on the manifold: push the disk out to NSIG·σ through exp_X
+  const R3=NSIG*std, arr=disk.geo.attributes.position.array;
+  for(let i=0;i<disk.rf.length;i++){ const rr=R3*disk.rf[i];
+    const d=e1.clone().multiplyScalar(rr*disk.cs[i]).addScaledVector(e2, rr*disk.sn[i]);
+    const p=expX(X,d).multiplyScalar(Rr*1.008);
+    arr[i*3]=p.x; arr[i*3+1]=p.y; arr[i*3+2]=p.z; }
+  disk.geo.attributes.position.needsUpdate=true; disk.geo.computeBoundingSphere();
+
+  // bounding circle at NSIG·σ: round in the tangent plane, warped on the manifold
+  const rc=NSIG*std, ta=tangRing.geometry.attributes.position.array, ma=manRing.geometry.attributes.position.array;
+  for(let i=0;i<RN;i++){ const a=i/RN*Math.PI*2;
+    const d=e1.clone().multiplyScalar(rc*Math.cos(a)).addScaledVector(e2, rc*Math.sin(a));
+    const t=X.clone().multiplyScalar(Rr).addScaledVector(X, 0.03).addScaledVector(d, Rr); ta[i*3]=t.x; ta[i*3+1]=t.y; ta[i*3+2]=t.z;
+    const m=expX(X,d).multiplyScalar(Rr*1.011);                  ma[i*3]=m.x; ma[i*3+1]=m.y; ma[i*3+2]=m.z; }
+  tangRing.geometry.attributes.position.needsUpdate=true;
+  manRing.geometry.attributes.position.needsUpdate=true;
+}
+
 const ray=new THREE.Raycaster();
 function ndc(e){ const r=host.getBoundingClientRect(); return new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1); }
 renderer.domElement.addEventListener('pointerdown', e=>{ ray.setFromCamera(ndc(e),camera);
   if(ray.intersectObject(sphere).length){ mode='pt'; move(e); } else { mode='orbit'; px=e.clientX; py=e.clientY; } });
-window.addEventListener('pointermove', e=>{ if(mode==='orbit'){ th-=(e.clientX-px)*0.008; ph=Math.min(3.0,Math.max(0.15,ph-(e.clientY-py)*0.008)); px=e.clientX; py=e.clientY; cam(); } else if(mode==='pt'){ move(e); } });
+window.addEventListener('pointermove', e=>{ if(mode==='orbit'){ th-=(e.clientX-px)*0.008; ph=Math.min(1.2,Math.max(0.1,ph-(e.clientY-py)*0.008)); px=e.clientX; py=e.clientY; cam(); } else if(mode==='pt'){ move(e); } });
 window.addEventListener('pointerup', ()=>mode=null);
-renderer.domElement.addEventListener('wheel', e=>{ e.preventDefault(); rad=Math.min(9,Math.max(3,rad*(1+Math.sign(e.deltaY)*0.08))); cam(); },{passive:false});
-function move(e){ ray.setFromCamera(ndc(e),camera); const h=ray.intersectObject(sphere); if(h.length){ X.copy(h[0].point).normalize(); update(); } }
+renderer.domElement.addEventListener('wheel', e=>{ e.preventDefault(); rad=Math.min(8,Math.max(2.6,rad*(1+Math.sign(e.deltaY)*0.08))); cam(); },{passive:false});
+function move(e){ ray.setFromCamera(ndc(e),camera); const h=ray.intersectObject(sphere);
+  if(h.length){ const p=h[0].point.clone().normalize();
+    const cc=Math.cos(CAP);                          // keep X on the visible cap
+    if(p.y<cc){ const hor=new THREE.Vector3(p.x,0,p.z); if(hor.length()<1e-6) hor.set(1,0,0);
+      hor.normalize().multiplyScalar(Math.sin(CAP)); p.set(hor.x,cc,hor.z); }
+    X.copy(p); update(); } }
 document.getElementById('sig').addEventListener('input', update);
 function resize(){ const r=host.getBoundingClientRect(); renderer.setSize(r.width,r.height); camera.aspect=r.width/r.height; camera.updateProjectionMatrix(); }
 window.addEventListener('resize', resize);
-function tick(){ requestAnimationFrame(tick); renderer.render(scene,camera); }
+function tick(){ requestAnimationFrame(tick); placeLabels(); renderer.render(scene,camera); }
 cam(); resize(); update(); tick();
 </script>
 </body>

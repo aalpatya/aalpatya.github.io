@@ -70,7 +70,7 @@
     <div class="intro-split l-middle">
         <p>A <strong>Lie group</strong> is a smooth 
           <span class="term" data-def="A space that bends back on itself, so you can't move in straight lines or add coordinates freely and stay on it — like the surface of a globe.">curved space</span> 
-          containing "things" that <span class="term" data-def="Transformations could be things like rotations, or [rotations+translations] that can affect vectors">transformations</span>, for example, rotations or poses.
+          containing "things" that represent <span class="term" data-def="Transformations could be things like rotations, or [rotations+translations] that can affect vectors">transformations</span>, for example, rotations or poses.
         <br><br>We can't do optimisation and maths directly on the curved space, so we temporarily work in a flat
           "tangent space", then convert the result back to the curved space.
         <br><br>Many resources for Lie Theory immediately go deep into mathematical details. <strong>This one won't.</strong></p>
@@ -177,15 +177,15 @@
       <div class="key">Technically the tangent space contains infinitesimal increments that update elements of a Lie group.</div>
       
     <h3>The tangent space at the <strong>identity element ε</strong> is called the <b>Lie Algebra</b>.</h3>
-    <p>Two mappings (functions) connect a Lie group (manifold) to its Lie algebra (tangent space at the identity element ε), and they are inverses of each other:</p>
+    <p>Two mappings (functions) connect a Lie group (manifold) to its Lie algebra, and they are inverses of each other:</p>
     <ul>
-      <li>The <strong>logarithmic map</strong> converts a Lie group element <span class="math math-inline">X</span> → Lie algebra element <span class="math math-inline">\tau^{\wedge}</span>:<br>
+      <li>The <strong>logarithmic map</strong> converts a Lie group element <span class="math math-inline">X</span> into a Lie algebra element <span class="math math-inline">\tau^{\wedge}</span>:<br>
         <span class="math math-inline">\tau^{\wedge} = \log(X)</span>.</li>
-      <li>The <strong>exponential map</strong> converts a Lie algebra element <span class="math math-inline">\tau^{\wedge}</span> → Lie group element <span class="math math-inline">X</span>:<br>
+      <li>The <strong>exponential map</strong> converts a Lie algebra element <span class="math math-inline">\tau^{\wedge}</span> into a Lie group element <span class="math math-inline">X</span>:<br>
         <span class="math math-inline">X = \exp(\tau^{\wedge})</span>.</li>
     </ul>
     <blockquote>Don't worry about the superscript <span class="math math-inline">\wedge</span> for now, we'll explain it in the next section.</blockquote>
-    <p>In this demo, press <strong>log</strong> to lift a point into the Lie algebra (tangent space at the identity ε), and <strong>exp</strong> to retract (wrap) it back onto the Lie group (manifold).
+    <p>In this demo, press <strong>log</strong> to lift a Lie group point into the Lie algebra (tangent space at the identity ε), and <strong>exp</strong> to retract (wrap) it back onto the Lie group (manifold).
     </p>
 
     <figure class="fig">
