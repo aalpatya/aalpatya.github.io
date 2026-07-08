@@ -59,6 +59,9 @@ body {
 /* Reserve space so the fixed nav doesn't cover content before JS runs */
 body { padding-top: 60px; }
 
+/* Anchor jumps (e.g. clicking a Contents entry) leave room for the 60px fixed banner */
+html { scroll-padding-top: 76px; }
+
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
