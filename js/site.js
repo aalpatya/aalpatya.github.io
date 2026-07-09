@@ -16,7 +16,7 @@ const NAV_LINKS = [
   { label: "Home",     href: "/" },
   { label: "Research", href: "/research/" },
   { label: "Projects", href: "/projects/" },
-  { label: "CV",       href: "/cv/" },
+  // { label: "CV",       href: "/cv/" },
 ];
 
 /* ---- inline icons ---- */
