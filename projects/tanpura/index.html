@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tanpura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=IBM+Plex+Mono:wght@400;500&family=Karla:wght@400;500&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+
+<!-- shared chrome + theme (no-flicker); loaded BEFORE the page styles so the
+     tanpura's own palette below still wins every conflict -->
+<link rel="stylesheet" href="/css/site.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("theme");
+      if (!t) t = "light";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+  :root{
+    --dusk:#1A0709;
+    --dusk-hi:#4A181C;
+    --bone:#EDE4D3;
+    --brass:#C9A227;
+    --gourd:#C08A4A;
+    --thread:#8FA6C4;
+    --dim:rgba(237,228,211,.42);
+    --faint:rgba(237,228,211,.16);
+  }
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    margin:0;
+    background:radial-gradient(120% 80% at 50% 0%, var(--dusk-hi), var(--dusk) 65%);
+    background-attachment:fixed;
+    color:var(--bone);
+    font-family:"Karla",system-ui,sans-serif;
+    /* top padding clears the fixed 60px site banner injected by site.js */
+    padding:84px 20px 0;
+  }
+  main{width:min(560px,100%);margin:0 auto}
+
+  header{text-align:center;margin-bottom:38px}
+  .deva{font-family:"Tiro Devanagari Hindi",serif;font-size:15px;color:var(--brass);letter-spacing:.04em}
+  header h1{
+    font-family:"Marcellus",serif;font-weight:400;
+    font-size:19px;letter-spacing:.42em;text-transform:uppercase;
+    margin:6px 0 0;color:var(--dim);text-indent:.42em;
+  }
+
+  .sa{text-align:center;margin-bottom:34px}
+  .sa .note{font-family:"Marcellus",serif;font-size:96px;line-height:1;color:var(--bone)}
+  .sa .note .sharp{font-size:52px;vertical-align:22px;margin-left:2px;color:var(--gourd)}
+  .sa .hz{
+    font-family:"IBM Plex Mono",monospace;font-size:13px;letter-spacing:.2em;
+    color:var(--dim);margin-top:10px;
+  }
+
+  /* A keyboard, because that is what twelve chromatic keys are. Naturals are a
+     flat row; the sharps ride over the seams between them, exactly where the
+     hand expects to find them. */
+  .keys{
+    position:relative;height:98px;margin-bottom:26px;
+    display:flex;gap:0;
+    filter:drop-shadow(0 6px 14px rgba(0,0,0,.45));
+  }
+  .white{
+    flex:1;
+    display:flex;align-items:flex-end;justify-content:center;
+    padding-bottom:9px;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;
+    color:rgba(20,27,43,.5);
+    background:linear-gradient(180deg,#F4EEE1 0%,#DFD5BE 88%,#C6BBA0 100%);
+    border:none;border-radius:0 0 3px 3px;
+    box-shadow:inset -1px 0 0 rgba(20,27,43,.28), inset 0 -3px 0 rgba(20,27,43,.10);
+    cursor:pointer;transition:background .1s;
+  }
+  .white:last-child{box-shadow:inset 0 -3px 0 rgba(20,27,43,.10)}
+  .white:hover{background:linear-gradient(180deg,#FFFBF1 0%,#EBE1CB 88%,#D2C7AC 100%)}
+  .white[aria-pressed="true"]{
+    background:linear-gradient(180deg,#EFD383 0%,var(--brass) 90%,#A8871B 100%);
+    color:rgba(20,27,43,.72);
+  }
+  .black{
+    position:absolute;top:0;z-index:2;
+    display:flex;align-items:flex-end;justify-content:center;
+    padding-bottom:8px;
+    font-family:"IBM Plex Mono",monospace;font-size:9px;
+    color:rgba(237,228,211,.5);
+    background:linear-gradient(180deg,#333E56 0%,#171F30 55%,#0B0F19 100%);
+    border:none;border-radius:0 0 3px 3px;
+    box-shadow:0 3px 6px rgba(0,0,0,.55), inset 0 1px 0 rgba(237,228,211,.14);
+    cursor:pointer;transition:background .1s;
+  }
+  .black:hover{background:linear-gradient(180deg,#42506E 0%,#1E273B 55%,#101623 100%)}
+  .black[aria-pressed="true"]{
+    background:linear-gradient(180deg,#C9A227 0%,#8A6E19 60%,#5C4910 100%);
+    color:var(--dusk);
+  }
+  .white:focus-visible,.black:focus-visible{outline:2px solid var(--brass);outline-offset:2px;z-index:3}
+
+  .play{
+    display:block;width:100%;padding:19px;
+    font-family:"Marcellus",serif;font-size:15px;letter-spacing:.34em;
+    text-transform:uppercase;text-indent:.34em;
+    color:var(--dusk);background:var(--bone);
+    border:none;border-radius:2px;cursor:pointer;margin-bottom:30px;
+  }
+  .play:hover{background:#fff}
+  .play[data-on="true"]{background:transparent;color:var(--brass);box-shadow:inset 0 0 0 1px var(--brass)}
+  .play:disabled{opacity:.45;cursor:default}
+
+  .faders{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;justify-items:center}
+  .fader{
+    display:flex;flex-direction:column;align-items:center;gap:9px;
+    user-select:none;touch-action:none;
+  }
+  .fname{
+    font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--dim);
+  }
+  .track{
+    position:relative;width:38px;height:136px;cursor:pointer;border-radius:3px;
+  }
+  /* the groove: a milled channel, not a line */
+  .groove{
+    position:absolute;left:50%;translate:-50% 0;top:0;bottom:0;width:3px;border-radius:2px;
+    background:linear-gradient(90deg,
+      rgba(0,0,0,.55) 0%, rgba(0,0,0,.30) 45%,
+      rgba(237,228,211,.10) 55%, rgba(237,228,211,.03) 100%);
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.7);
+  }
+  .lit{
+    position:absolute;left:50%;translate:-50% 0;width:3px;border-radius:2px;
+    background:var(--brass);
+    box-shadow:0 0 7px rgba(201,162,39,.5);
+  }
+  /* the centre detent, for the controls that have a true zero */
+  .detent{
+    position:absolute;left:50%;translate:-50% 0;top:50%;width:15px;height:1px;
+    background:rgba(237,228,211,.22);
+  }
+  .cap{
+    position:absolute;left:50%;translate:-50% -50%;
+    width:30px;height:13px;border-radius:2px;
+    background:linear-gradient(180deg,#F3ECDD 0%,#CFC2A3 45%,#8A7D62 46%,#6E6249 100%);
+    box-shadow:0 2px 5px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  /* the milled line across the cap — where a finger finds it */
+  .cap::after{
+    content:"";position:absolute;left:4px;right:4px;top:50%;height:1px;
+    translate:0 -50%;
+    background:rgba(20,27,43,.55);
+  }
+  .track:hover .cap{background:linear-gradient(180deg,#FFF9EC 0%,#DED09E 45%,#9A8C68 46%,#7C6F52 100%)}
+  .track:active .cap{box-shadow:0 1px 3px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.5)}
+  .track:focus-visible{outline:2px solid var(--brass);outline-offset:4px}
+  .fval{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--bone)}
+
+  footer{margin-top:34px}
+  .status{
+    display:block;
+    font-family:"IBM Plex Mono",monospace;font-size:10px;line-height:1.6;color:var(--dim);
+  }
+  .status.err{color:var(--gourd)}
+  .credit{
+    font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:rgba(237,228,211,.22);
+  }
+  .credit a{color:rgba(237,228,211,.4);text-decoration:underline}
+  .credit a:hover{color:var(--brass)}
+
+  :focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+  @media (max-width:560px){
+    .sa .note{font-size:74px}
+    .keys{height:84px}
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="deva">तानपुरा</div>
+    <h1>Tanpura</h1>
+  </header>
+
+  <section class="sa">
+    <div class="note" id="note">C</div>
+    <div class="hz" id="hz">Sa · 130.8 Hz</div>
+  </section>
+
+  <nav class="keys" id="keys" aria-label="Key"></nav>
+
+  <button class="play" id="play" data-on="false">Play</button>
+
+  <div class="faders" id="faders"></div>
+
+  <footer>
+    <span class="status" id="status"></span>
+    <!-- attribution for the built-in recordings goes here -->
+    <div class="credit" id="credit">C and F tanpura recordings via <a href="https://ragajunglism.org/ragas/tanpuras/" target="_blank" rel="noopener">Rāga Junglism</a>. Original performer unknown.</div>
+  </footer>
+</main>
+
+<script type="module">
+const $ = id => document.getElementById(id);
+const NOTES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+
+/* The key map.
+
+   Sa for each key, and which recording it is drawn from. C and F are the two
+   real instruments; everything else is one of them stretched, never by more than
+   four semitones, and always upward from F — a drone stretched down too far goes
+   dull, and stretched up too far goes thin.
+
+     C  C# D  D# E   from the C tanpura, up 0–4
+     F  F# G  G# A   from the F tanpura, up 0–4
+     A# B            from the C tanpura, down 2 and 1
+
+   A# and B therefore speak an octave below their neighbours, which is how these
+   keys are normally tuned anyway: it keeps Sa in a register that resonates. */
+const SA  = [130.81, 138.59, 146.83, 155.56, 164.81,
+             174.61, 185.00, 196.00, 207.65, 220.00,
+             116.54, 123.47];
+const SRC = ["C","C","C","C","C", "F","F","F","F","F", "C","C"];
+
+/* State */
+let audio, master, reverb, droneBus, bass, treble;
+let sources = {};                       // { C: {buffer, sa}, F: {...} }
+let keyPc = 0, cents = 0, playing = false, ready = false;
+let voice = null;                       // { node, gain, key } currently sounding
+
+const srcFor = pc => sources[SRC[pc]] || sources.C || sources.F;
+const targetSa = () => SA[keyPc] * Math.pow(2, cents / 1200);
+const pcOf = f => ((Math.round(69 + 12 * Math.log2(f / 440)) % 12) + 12) % 12;
+
+function rateFor(pc){
+  const s = srcFor(pc);
+  if (!s || !s.sa) return 1;
+  return (SA[pc] * Math.pow(2, cents / 1200)) / s.sa;
+}
+
+/* ---------------- interface ---------------- */
+
+/* Seven naturals in a row; five sharps floating over the seams. The sharps sit
+   after C, D, F, G and A — never between E-F or B-C, which is what gives a
+   keyboard its shape. */
+const WHITE = [0, 2, 4, 5, 7, 9, 11];              // C D E F G A B
+const BLACK = [[1, 0], [3, 1], [6, 3], [8, 4], [10, 5]];   // [pitch class, seam after this white key]
+const keyBtn = [];
+
+const W = 100 / 7;                                  // one white key, in percent
+const BW = W * 0.58;                                // sharps are narrower
+
+function addKey(pc, cls, style = ""){
+  const b = document.createElement("button");
+  b.className = cls;
+  b.textContent = NOTES[pc].replace("#", "\u266F");
+  b.dataset.pc = pc;
+  b.setAttribute("aria-label", NOTES[pc]);
+  b.setAttribute("aria-pressed", pc === keyPc ? "true" : "false");
+  if (style) b.style.cssText = style;
+  b.addEventListener("click", () => setKey(pc));
+  $("keys").appendChild(b);
+  keyBtn[pc] = b;
+}
+
+WHITE.forEach(pc => addKey(pc, "white"));
+BLACK.forEach(([pc, seam]) =>
+  addKey(pc, "black", `left:${(seam + 1) * W - BW / 2}%; width:${BW}%; height:62%;`));
+
+function paint(){
+  keyBtn.forEach((b, pc) => b.setAttribute("aria-pressed", pc === keyPc ? "true" : "false"));
+
+  const n = NOTES[keyPc];
+  $("note").innerHTML = n.length > 1 ? n[0] + '<span class="sharp">\u266F</span>' : n;
+  $("hz").textContent = "Sa \u00B7 " + targetSa().toFixed(1) + " Hz";
+
+  $("play").textContent = playing ? "Stop" : "Play";
+  $("play").dataset.on = playing ? "true" : "false";
+  $("play").disabled = !ready;
+}
+
+function setKey(pc){
+  keyPc = pc;
+  paint();
+  if (playing) retune();
+}
+
+/* ---------------- faders ----------------
+
+   A vertical slider reads its position from across the room, which a knob does
+   not, and it can be aimed at: press anywhere on the track and the cap goes
+   there. Drag is absolute — the cap follows the finger rather than accumulating
+   deltas — because that is the only behaviour consistent with click-to-position.
+   Bipolar faders light upward or downward from the centre detent, so "flat"
+   and "in tune" are visible at a glance. */
+
+const CAP = 13;                                   // cap height, px
+
+function makeFader(o){
+  const wrap = document.createElement("div");
+  wrap.className = "fader";
+  wrap.innerHTML = `
+    <span class="fname">${o.name}</span>
+    <div class="track" tabindex="0" role="slider" aria-label="${o.name}">
+      <div class="groove"></div>
+      ${o.bipolar ? '<div class="detent"></div>' : ''}
+      <div class="lit"></div>
+      <div class="cap"></div>
+    </div>
+    <span class="fval"></span>`;
+
+  const track = wrap.querySelector(".track");
+  const lit   = wrap.querySelector(".lit");
+  const cap   = wrap.querySelector(".cap");
+  const val   = wrap.querySelector(".fval");
+
+  let v = o.value;
+
+  function render(){
+    const H = track.clientHeight || 136;
+    const travel = H - CAP;
+    const frac = (v - o.min) / (o.max - o.min);          // 0 at bottom, 1 at top
+    const y = CAP / 2 + (1 - frac) * travel;             // cap centre, from the top
+
+    cap.style.top = y + "px";
+
+    /* the lit part of the groove: up from the floor, or out from the detent */
+    const zero = o.bipolar ? CAP / 2 + 0.5 * travel : H;
+    lit.style.top    = Math.min(y, zero) + "px";
+    lit.style.height = Math.abs(zero - y) + "px";
+
+    val.textContent = o.format(v);
+    track.setAttribute("aria-valuenow", v);
+    track.setAttribute("aria-valuetext", o.format(v));
+  }
+
+  function set(x){
+    const c = Math.min(o.max, Math.max(o.min, x));
+    v = Math.round(c / o.step) * o.step;
+    render();
+    o.onchange(v);
+  }
+
+  /* absolute: wherever the pointer is, that is where the cap goes */
+  function fromPointer(clientY){
+    const r = track.getBoundingClientRect();
+    const travel = r.height - CAP;
+    const pos = (clientY - r.top - CAP / 2) / travel;    // 0 at top, 1 at bottom
+    const frac = 1 - Math.min(1, Math.max(0, pos));
+    set(o.min + frac * (o.max - o.min));
+  }
+
+  track.setAttribute("aria-valuemin", o.min);
+  track.setAttribute("aria-valuemax", o.max);
+  render();
+
+  let dragging = false;
+  track.addEventListener("pointerdown", e => {
+    dragging = true;
+    track.setPointerCapture(e.pointerId);
+    fromPointer(e.clientY);                             // a click IS a move
+    e.preventDefault();
+  });
+  track.addEventListener("pointermove", e => { if (dragging) fromPointer(e.clientY); });
+  const release = e => { dragging = false; try { track.releasePointerCapture(e.pointerId); } catch {} };
+  track.addEventListener("pointerup", release);
+  track.addEventListener("pointercancel", release);
+
+  track.addEventListener("wheel", e => {
+    e.preventDefault();
+    set(v - Math.sign(e.deltaY) * o.step * (e.shiftKey ? 1 : 4));
+  }, { passive: false });
+
+  track.addEventListener("keydown", e => {
+    const big = o.step * 5;
+    if (e.key === "ArrowUp"   || e.key === "ArrowRight") set(v + (e.shiftKey ? o.step : big));
+    else if (e.key === "ArrowDown" || e.key === "ArrowLeft") set(v - (e.shiftKey ? o.step : big));
+    else if (e.key === "Home") set(o.def);
+    else if (e.key === "PageUp")   set(v + big * 4);
+    else if (e.key === "PageDown") set(v - big * 4);
+    else return;
+    e.preventDefault();
+  });
+
+  track.addEventListener("dblclick", () => set(o.def));
+
+  $("faders").appendChild(wrap);
+  window.addEventListener("resize", render);
+  return { set, get: () => v };
+}
+
+let volPct = 70;
+const level = () => Math.pow(volPct / 100, 1.6) * 0.75;
+
+makeFader({
+  name: "Volume", min: 0, max: 100, step: 1, value: 70, def: 70,
+  format: x => String(Math.round(x)),
+  onchange: x => {
+    volPct = x;
+    if (playing) droneBus.gain.setTargetAtTime(level(), audio.currentTime, 0.1);
+  }
+});
+
+makeFader({
+  name: "Bass", min: -12, max: 12, step: 0.5, value: 0, def: 0, bipolar: true,
+  format: x => (x > 0 ? "+" : "") + x.toFixed(1) + " dB",
+  onchange: x => { if (bass) bass.gain.setTargetAtTime(x, audio.currentTime, 0.08); }
+});
+
+makeFader({
+  name: "Treble", min: -12, max: 12, step: 0.5, value: 0, def: 0, bipolar: true,
+  format: x => (x > 0 ? "+" : "") + x.toFixed(1) + " dB",
+  onchange: x => { if (treble) treble.gain.setTargetAtTime(x, audio.currentTime, 0.08); }
+});
+
+makeFader({
+  name: "Fine tune", min: -50, max: 50, step: 1, value: 0, def: 0, bipolar: true,
+  format: x => (x > 0 ? "+" : "") + Math.round(x),
+  onchange: x => {
+    cents = x;
+    paint();
+    if (voice) voice.node.playbackRate.setTargetAtTime(rateFor(keyPc), audio.currentTime, 0.2);
+  }
+});
+
+$("play").addEventListener("click", () => playing ? stop() : start());
+
+const stat = (msg, cls = "") => { $("status").textContent = msg; $("status").className = "status " + cls; };
+
+/* ---------------- audio ---------------- */
+
+function buildAudio(){
+  audio = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: "playback" });
+
+  master = audio.createDynamicsCompressor();
+  master.threshold.value = -4;
+  master.knee.value = 8;
+  master.ratio.value = 8;
+  master.attack.value = 0.005;
+  master.release.value = 0.3;
+  master.connect(audio.destination);
+
+  reverb = audio.createConvolver();
+  reverb.buffer = makeIR(2.8, 3);
+  const wet = audio.createGain();
+  wet.gain.value = 0.5;
+  reverb.connect(wet).connect(master);
+
+  /* shelves, not peaks: a tanpura's weight is everything under the low Sa, and
+     its jivari is everything above a few kHz. Both ends want lifting or taming
+     as a whole, not a surgical notch. */
+  bass = audio.createBiquadFilter();
+  bass.type = "lowshelf";
+  bass.frequency.value = 160;
+  bass.gain.value = 0;
+
+  treble = audio.createBiquadFilter();
+  treble.type = "highshelf";
+  treble.frequency.value = 2800;
+  treble.gain.value = 0;
+
+  droneBus = audio.createGain();
+  droneBus.gain.value = 0;
+
+  bass.connect(treble).connect(droneBus);
+  droneBus.connect(master);
+  const send = audio.createGain();
+  send.gain.value = 0.18;
+  droneBus.connect(send).connect(reverb);
+}
+
+function makeIR(seconds, decay){
+  const len = Math.floor(audio.sampleRate * seconds);
+  const ir = audio.createBuffer(2, len, audio.sampleRate);
+  for (let c = 0; c < 2; c++){
+    const d = ir.getChannelData(c);
+    for (let i = 0; i < len; i++)
+      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+  }
+  return ir;
+}
+
+/* ---------------- analysis ---------------- */
+
+function toMono(buf){
+  const n = buf.length, ch = buf.numberOfChannels, m = new Float32Array(n);
+  for (let c = 0; c < ch; c++){
+    const d = buf.getChannelData(c);
+    for (let i = 0; i < n; i++) m[i] += d[i] / ch;
+  }
+  return m;
+}
+
+/* The Sa, by autocorrelation. Careful: the lowest string of a tanpura IS Sa an
+   octave down, so autocorrelation honestly reports ~65 Hz on a C tanpura. Fold
+   it back up into the register the instrument actually speaks in. */
+function detectSa(m, sr){
+  const dec = 4, sd = sr / dec;
+  const start = Math.floor(m.length * 0.4);
+  const len = Math.min(Math.floor(sd * 3), Math.floor((m.length - start) / dec));
+  if (len < 1000) return null;
+  const x = new Float32Array(len);
+  for (let i = 0; i < len; i++) x[i] = m[start + i * dec];
+  let best = 0, bestLag = 0;
+  for (let lag = Math.floor(sd / 250); lag <= Math.floor(sd / 45); lag++){
+    let s = 0, a = 0, b = 0;
+    for (let i = 0; i + lag < len; i++){ s += x[i] * x[i + lag]; a += x[i] * x[i]; b += x[i + lag] * x[i + lag]; }
+    const r = s / (Math.sqrt(a * b) + 1e-9);
+    if (r > best){ best = r; bestLag = lag; }
+  }
+  if (!bestLag) return null;
+  let sa = sd / bestLag;
+  while (sa < 110) sa *= 2;
+  while (sa > 220) sa /= 2;
+  return sa;
+}
+
+/* Find a loop.
+
+   A tanpura is not periodic — the plucks drift — so the cycle lives in the
+   amplitude ENVELOPE, not the waveform. Find the gap between plucks there, take
+   a long loop (~20s, dozens of plucks, so the repeat never announces itself)
+   snapped to a whole number of plucks so the rhythm survives the wrap, then
+   phase-align the endpoint against the WAVEFORM and crossfade.
+
+   The crossfade folds the audio AFTER the loop end back into the head, so the
+   buffer's last sample and its first are adjacent samples in the original: the
+   wrap cannot click by construction. The only real risk is phase cancellation
+   inside the crossfade, which is what the alignment pass prevents. */
+function findLoop(buf, m, target = 20){
+  const sr = buf.sampleRate, hop = 512;
+  const nf = Math.floor(m.length / hop);
+  const env = new Float32Array(nf), flux = new Float32Array(nf);
+  for (let f = 0; f < nf; f++){
+    let s = 0;
+    for (let i = f * hop; i < (f + 1) * hop; i++) s += m[i] * m[i];
+    env[f] = Math.sqrt(s / hop);
+  }
+  for (let f = 1; f < nf; f++) flux[f] = Math.max(0, env[f] - env[f - 1]);
+
+  const from = Math.floor(2 * sr / hop);
+  const span = Math.min(nf - from - Math.floor(3 * sr / hop), Math.floor(45 * sr / hop));
+  if (span < Math.floor(6 * sr / hop)) return null;
+
+  let bestLag = 0, bestR = -1;
+  for (let lag = Math.floor(0.5 * sr / hop); lag <= Math.floor(3 * sr / hop); lag++){
+    let s = 0, a = 0, b = 0;
+    for (let i = from; i < from + span; i++){
+      s += flux[i] * flux[i + lag]; a += flux[i] * flux[i]; b += flux[i + lag] * flux[i + lag];
+    }
+    const r = s / (Math.sqrt(a * b) + 1e-9);
+    if (r > bestR){ bestR = r; bestLag = lag; }
+  }
+  const gap = bestLag * hop / sr;
+  if (!gap) return null;
+
+  let sf = from, quiet = Infinity;
+  for (let i = from; i < from + Math.floor(3 * sr / hop) && i < nf; i++)
+    if (env[i] < quiet){ quiet = env[i]; sf = i; }
+  const S = sf * hop;
+
+  const n = Math.max(4, Math.round(target / gap));
+  let L = Math.round(n * gap * sr);
+
+  const W = 4096, R = Math.floor(sr * 0.06);
+  let bestD = 0, bestC = -Infinity;
+  for (let dd = -R; dd <= R; dd++){
+    if (S + L + dd + W >= m.length) break;
+    let s = 0, a = 0, b = 0;
+    for (let i = 0; i < W; i++){
+      const p = m[S + i], q = m[S + L + dd + i];
+      s += p * q; a += p * p; b += q * q;
+    }
+    const c = s / (Math.sqrt(a * b) + 1e-9);
+    if (c > bestC){ bestC = c; bestD = dd; }
+  }
+  L += bestD;
+
+  const X = Math.min(Math.floor(sr * 1.5), Math.floor(L / 8));
+  if (L <= 0 || S + L + X > m.length) return null;
+
+  const out = audio.createBuffer(buf.numberOfChannels, L, sr);
+  for (let c = 0; c < buf.numberOfChannels; c++){
+    const src = buf.getChannelData(c), dst = out.getChannelData(c);
+    for (let i = 0; i < L; i++) dst[i] = src[S + i];
+    for (let i = 0; i < X; i++){
+      const t = i / X;
+      dst[i] = src[S + i] * Math.sin(t * Math.PI / 2) + src[S + L + i] * Math.cos(t * Math.PI / 2);
+    }
+  }
+  return { buffer: out, seconds: L / sr, plucks: n, align: bestC };
+}
+
+/* ---------------- loading ---------------- */
+
+function analyse(buf){
+  const m = toMono(buf);
+  const loop = findLoop(buf, m);
+  if (!loop) return null;
+  return { buffer: loop.buffer, sa: detectSa(m, buf.sampleRate) };
+}
+
+/* The recordings sit next to this page as ordinary files, so the browser caches
+   them and the HTML stays small and readable. This needs to be served over http
+   — opening index.html straight off disk will be blocked by CORS. For a local
+   preview: python3 -m http.server, then visit localhost:8000. */
+const RECORDINGS = { C: "c.mp3", F: "f.mp3" };
+
+async function loadRecordings(){
+  await Promise.all(Object.entries(RECORDINGS).map(async ([slot, file]) => {
+    try {
+      const res = await fetch(file);
+      if (!res.ok) throw new Error(res.status);
+      const done = analyse(await audio.decodeAudioData(await res.arrayBuffer()));
+      if (done) sources[slot] = done;
+    } catch { /* slot stays empty; its keys fall back to the other recording */ }
+  }));
+
+  if (!Object.keys(sources).length){
+    stat("Couldn't load the tanpura recordings. If you opened this file directly, " +
+         "serve it over http instead — the browser blocks local file requests.", "err");
+    return;
+  }
+  ready = true;
+  paint();
+}
+
+/* ---------------- transport ---------------- */
+
+function voiceOn(when = 0){
+  const s = srcFor(keyPc);
+  if (!s) return null;
+  const node = audio.createBufferSource();
+  node.buffer = s.buffer;
+  node.loop = true;
+  node.playbackRate.value = rateFor(keyPc);
+  const gain = audio.createGain();
+  gain.gain.value = 0;
+  node.connect(gain).connect(bass);
+  node.start();
+  gain.gain.setTargetAtTime(1, audio.currentTime + when, 0.5);
+  return { node, gain, src: s };
+}
+
+function voiceOff(v, fade = 1.2){
+  if (!v) return;
+  const t = audio.currentTime;
+  v.gain.gain.cancelScheduledValues(t);
+  v.gain.gain.setTargetAtTime(0, t, fade / 3);
+  setTimeout(() => { try { v.node.stop(); } catch {} v.node.disconnect(); v.gain.disconnect(); }, fade * 1000 + 500);
+}
+
+async function start(){
+  if (audio.state === "suspended") await audio.resume();
+  voiceOff(voice, 0.4);
+  voice = voiceOn();
+  playing = true;
+  droneBus.gain.cancelScheduledValues(audio.currentTime);
+  droneBus.gain.setTargetAtTime(level(), audio.currentTime, 0.6);
+  paint();
+}
+
+function stop(){
+  playing = false;
+  droneBus.gain.setTargetAtTime(0, audio.currentTime, 0.8);
+  const v = voice; voice = null;
+  setTimeout(() => voiceOff(v, 0.1), 2500);
+  paint();
+}
+
+/* Changing key: if it's the same recording, just slide the playback rate —
+   the drone bends into the new Sa without a seam. If it's the other recording,
+   the buffer has to change, so crossfade the two. */
+async function retune(force = false){
+  if (!playing) return;
+  const s = srcFor(keyPc);
+  if (!force && voice && voice.src === s){
+    voice.node.playbackRate.setTargetAtTime(rateFor(keyPc), audio.currentTime, 0.25);
+    return;
+  }
+  const old = voice;
+  voice = voiceOn();
+  voiceOff(old, 1.2);
+}
+
+/* ---------------- go ---------------- */
+buildAudio();
+paint();
+loadRecordings();
+</script>
+
+<!-- shared nav bar + footer + theme toggle -->
+<script src="/js/site.js" defer></script>
+</body>
+</html>
