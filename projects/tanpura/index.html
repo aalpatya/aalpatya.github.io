@@ -656,7 +656,21 @@ function voiceOff(v, fade = 1.2){
   setTimeout(() => { try { v.node.stop(); } catch {} v.node.disconnect(); v.gain.disconnect(); }, fade * 1000 + 500);
 }
 
+/* iOS silences a pure Web-Audio page under the ring/silent switch, because the
+   page defaults to the "ambient" audio session. Declaring playback intent
+   (Safari 16.4+) routes it through the media channel so it sounds regardless of
+   the switch. Set from inside the tap for good measure. It's a plain property
+   set, wrapped so any surprise can't stop playback from starting.
+
+   (An earlier version also primed a silent <audio> element for pre-16.4 iOS,
+   but starting a media element can interrupt the AudioContext on iOS — which
+   killed playback entirely — so it was removed.) */
+function primeAudioSession(){
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch {}
+}
+
 async function start(){
+  primeAudioSession();
   if (audio.state === "suspended") await audio.resume();
   voiceOff(voice, 0.4);
   voice = voiceOn();
@@ -674,14 +688,16 @@ function stop(){
   paint();
 }
 
-/* Changing key: if it's the same recording, just slide the playback rate —
-   the drone bends into the new Sa without a seam. If it's the other recording,
-   the buffer has to change, so crossfade the two. */
+/* Changing key: if it's the same recording, jump the playback rate straight to
+   the new Sa — an instant switch, no glide between keys. If it's the other
+   recording, the buffer has to change, so crossfade the two. */
 async function retune(force = false){
   if (!playing) return;
   const s = srcFor(keyPc);
   if (!force && voice && voice.src === s){
-    voice.node.playbackRate.setTargetAtTime(rateFor(keyPc), audio.currentTime, 0.25);
+    const pr = voice.node.playbackRate;
+    pr.cancelScheduledValues(audio.currentTime);
+    pr.setValueAtTime(rateFor(keyPc), audio.currentTime);
     return;
   }
   const old = voice;
