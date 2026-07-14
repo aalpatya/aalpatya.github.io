@@ -688,18 +688,12 @@ function stop(){
   paint();
 }
 
-/* Changing key: if it's the same recording, jump the playback rate straight to
-   the new Sa — an instant switch, no glide between keys. If it's the other
-   recording, the buffer has to change, so crossfade the two. */
-async function retune(force = false){
+/* Changing key always crossfades: start a fresh voice at the new Sa and fade the
+   old one out under it. This is what gives the smooth handover when the recording
+   changes (C ↔ F), and applying it to same-recording changes too means every key
+   switch fades the same way instead of snapping the pitch. */
+async function retune(){
   if (!playing) return;
-  const s = srcFor(keyPc);
-  if (!force && voice && voice.src === s){
-    const pr = voice.node.playbackRate;
-    pr.cancelScheduledValues(audio.currentTime);
-    pr.setValueAtTime(rateFor(keyPc), audio.currentTime);
-    return;
-  }
   const old = voice;
   voice = voiceOn();
   voiceOff(old, 1.2);
